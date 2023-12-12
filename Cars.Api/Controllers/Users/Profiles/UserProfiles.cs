@@ -1,11 +1,10 @@
 ﻿using AutoMapper;
 using Cars.Api.Controllers.Users.Models;
 using LearnProject.BLL.Contracts.Models;
-using System.Data;
 
 namespace Cars.Api.Controllers.Users.Profiles
 {
-    public class Profiles
+    public class UserProfiles
     {
         /// <summary>
         /// маппинг (модель пользователя из сервиса  -> модель ответа клиенту)

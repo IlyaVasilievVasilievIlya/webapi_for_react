@@ -1,0 +1,423 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Cars.Api</name>
+    </assembly>
+    <members>
+        <member name="M:Cars.Api.Configuration.ConfigureAuth.AddAppAuth(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.ConfigurationManager)">
+            <summary>
+            метод расширения для настройки аутентификации
+            </summary>
+            <param name="services">коллекция сервисов</param>
+            <param name="configuration">объект конфигурации</param>
+            <returns>коллекция сервисов</returns>
+        </member>
+        <member name="M:Cars.Api.Configuration.ConfigurePolicies.AddAppPolicies(Microsoft.AspNetCore.Authorization.AuthorizationOptions)">
+            <summary>
+            метод расширения для добавления политик
+            </summary>
+            <param name="options">объект настроек авторизации</param>
+        </member>
+        <member name="T:Cars.Api.Configuration.ConfigureSwagger">
+            <summary>
+            настройка swagger
+            </summary>
+        </member>
+        <member name="M:Cars.Api.Configuration.DbInitializer.ApplyMigrations(Microsoft.AspNetCore.Builder.WebApplication)">
+            <summary>
+            автомиграция БД
+            </summary>
+            <param name="app">класс приложения</param>
+        </member>
+        <member name="M:Cars.Api.Configuration.Bootstrapper.AddAppServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            метод расширения для подключения сервисов из бизнес-слоя
+            </summary>
+            <param name="services">коллекция DI</param>
+            <returns>коллекция DI</returns>
+        </member>
+        <member name="T:Cars.Api.Controllers.Cars.CarsController">
+            <summary>
+            контроллер машин
+            </summary>
+        </member>
+        <member name="M:Cars.Api.Controllers.Cars.CarsController.GetCars(System.Int32,System.Int32)">
+            <summary>
+            получение авто
+            </summary>
+        </member>
+        <member name="M:Cars.Api.Controllers.Cars.CarsController.GetCarById(System.Int32)">
+            <summary>
+            получение авто по id
+            </summary>
+            <param name="id">id машины</param>
+        </member>
+        <member name="M:Cars.Api.Controllers.Cars.CarsController.AddCar(Cars.Api.Controllers.Cars.Models.AddCarRequest)">
+            <summary>
+            попытка добавления машины
+            </summary>
+        </member>
+        <member name="M:Cars.Api.Controllers.Cars.CarsController.UpdateCar(System.Int32,Cars.Api.Controllers.Cars.Models.UpdateCarRequest)">
+            <summary>
+            попытка редактирования
+            </summary>
+            <param name="id">id машины</param>
+            <param name="request">модель запроса</param>
+        </member>
+        <member name="M:Cars.Api.Controllers.Cars.CarsController.DeleteCar(System.Int32)">
+            <summary>
+            попытка удаления
+            </summary>
+            <param name="id">id машины</param>
+        </member>
+        <member name="T:Cars.Api.Controllers.Cars.Models.AddCarRequest">
+            <summary>
+            модель запроса на добавление машины
+            </summary>
+        </member>
+        <member name="T:Cars.Api.Controllers.Cars.Models.CarResponse">
+            <summary>
+            ответ со списком машин
+            </summary>
+        </member>
+        <member name="P:Cars.Api.Controllers.Cars.Models.CarResponse.CarId">
+            <summary>
+            id авто
+            </summary>
+        </member>
+        <member name="P:Cars.Api.Controllers.Cars.Models.CarResponse.Brand">
+            <summary>
+            марка
+            </summary>
+        </member>
+        <member name="P:Cars.Api.Controllers.Cars.Models.CarResponse.Model">
+            <summary>
+            модель
+            </summary>
+        </member>
+        <member name="P:Cars.Api.Controllers.Cars.Models.CarResponse.Color">
+            <summary>
+            цвет
+            </summary>
+        </member>
+        <member name="T:Cars.Api.Controllers.Cars.Models.UpdateCarRequest">
+            <summary>
+            запрос на редактирование авто
+            </summary>
+        </member>
+        <member name="T:Cars.Api.Controllers.Cars.Profiles.CarResponseProfile">
+            <summary>
+            маппинг (модель машины из сервиса  -> модель списка ответа )
+            </summary>
+        </member>
+        <member name="T:Cars.Api.Controllers.Cars.Profiles.AddCarRequestProfile">
+            <summary>
+            маппинг (модель запроса на добавление -> модель добавления из сервиса)
+            </summary>
+        </member>
+        <member name="T:Cars.Api.Controllers.Cars.Profiles.UpdateCarRequestProfile">
+            <summary>
+            маппинг (модель запроса на редактирование -> модель редактирования сервиса)
+            </summary>
+        </member>
+        <member name="T:Cars.Api.Controllers.Identity.IdentityController">
+            <summary>
+            контроллер для работы с токенами
+            </summary>
+        </member>
+        <member name="M:Cars.Api.Controllers.Identity.IdentityController.#ctor(LearnProject.BLL.Contracts.IIdentityService,AutoMapper.IMapper)">
+            <summary>
+            конструктор контроллера
+            </summary>
+            <param name="identityService">сервис аутентификации</param>
+            <param name="mapper">маппер</param>
+        </member>
+        <member name="M:Cars.Api.Controllers.Identity.IdentityController.Register(Cars.Api.Controllers.Identity.Models.RegisterRequest)">
+            <summary>
+            регистрация
+            </summary>
+            <param name="request">модель запроса на регистрацию</param>
+        </member>
+        <member name="M:Cars.Api.Controllers.Identity.IdentityController.Login(Cars.Api.Controllers.Identity.Models.LoginRequest)">
+            <summary>
+            создание токенов
+            </summary>
+            <param name="request">модель запроса для входа</param>
+        </member>
+        <member name="M:Cars.Api.Controllers.Identity.IdentityController.RefreshToken(Cars.Api.Controllers.Identity.Models.TokenRefreshRequest)">
+            <summary>
+            перевыпуск токена
+            </summary>
+            <param name="request">модель запроса для перевыпуска токенов</param>
+        </member>
+        <member name="T:Cars.Api.Controllers.Identity.Models.LoginRequest">
+            <summary>
+            модель запроса для входа
+            </summary>
+        </member>
+        <member name="P:Cars.Api.Controllers.Identity.Models.LoginRequest.Email">
+            <summary>
+            логин
+            </summary>
+        </member>
+        <member name="P:Cars.Api.Controllers.Identity.Models.LoginRequest.Password">
+            <summary>
+            пароль
+            </summary>
+        </member>
+        <member name="T:Cars.Api.Controllers.Identity.Models.RegisterRequest">
+            <summary>
+            модель запроса для регистрации
+            </summary>
+        </member>
+        <member name="P:Cars.Api.Controllers.Identity.Models.RegisterRequest.Email">
+            <summary>
+            почта/логин
+            </summary>
+        </member>
+        <member name="P:Cars.Api.Controllers.Identity.Models.RegisterRequest.Password">
+            <summary>
+            пароль
+            </summary>
+        </member>
+        <member name="P:Cars.Api.Controllers.Identity.Models.RegisterRequest.Name">
+            <summary>
+            имя
+            </summary>
+        </member>
+        <member name="P:Cars.Api.Controllers.Identity.Models.RegisterRequest.Surname">
+            <summary>
+            фамилия
+            </summary>
+        </member>
+        <member name="P:Cars.Api.Controllers.Identity.Models.RegisterRequest.Patronymic">
+            <summary>
+            отчество
+            </summary>
+        </member>
+        <member name="P:Cars.Api.Controllers.Identity.Models.RegisterRequest.BirthDate">
+            <summary>
+            дата рождения
+            </summary>
+        </member>
+        <member name="T:Cars.Api.Controllers.Identity.Models.DateRange">
+            <summary>
+            проверка введенной даты на сервере
+            </summary>
+        </member>
+        <member name="M:Cars.Api.Controllers.Identity.Models.DateRange.#ctor(System.String)">
+            <summary>
+            конструктор
+            </summary>
+            <param name="minDate"></param>
+        </member>
+        <member name="M:Cars.Api.Controllers.Identity.Models.DateRange.IsValid(System.Object,System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            проверка на адекватную дату
+            </summary>
+            <param name="value">дата</param>
+            <param name="validationContext"></param>
+        </member>
+        <member name="T:Cars.Api.Controllers.Identity.Models.TokenGenerationResponse">
+            <summary>
+            модель полученного ответа с токеном
+            </summary>
+        </member>
+        <member name="P:Cars.Api.Controllers.Identity.Models.TokenGenerationResponse.AccessToken">
+            <summary>
+            токен доступа
+            </summary>
+        </member>
+        <member name="P:Cars.Api.Controllers.Identity.Models.TokenGenerationResponse.RefreshToken">
+            <summary>
+            refresh токен
+            </summary>
+        </member>
+        <member name="T:Cars.Api.Controllers.Identity.Models.TokenRefreshRequest">
+            <summary>
+            модель для запроса перевыпуска токена
+            </summary>
+        </member>
+        <member name="P:Cars.Api.Controllers.Identity.Models.TokenRefreshRequest.AccessToken">
+            <summary>
+            токен доступа
+            </summary>
+        </member>
+        <member name="P:Cars.Api.Controllers.Identity.Models.TokenRefreshRequest.RefreshToken">
+            <summary>
+            refresh токен
+            </summary>
+        </member>
+        <member name="T:Cars.Api.Controllers.Identity.Profiles.IdentityProfiles">
+            <summary>
+            профили маппинга сервиса аутентификации
+            </summary>
+        </member>
+        <member name="T:Cars.Api.Controllers.Identity.Profiles.IdentityProfiles.LoginRequestProfile">
+            <summary>
+            маппинг (модель запроса на логин  -> модель запроса для сервиса)
+            </summary>
+        </member>
+        <member name="T:Cars.Api.Controllers.Identity.Profiles.IdentityProfiles.TokenRefreshRequestProfile">
+            <summary>
+            маппинг (модель запроса на обновление токена -> модель запроса для сервиса)
+            </summary>
+        </member>
+        <member name="T:Cars.Api.Controllers.Identity.Profiles.IdentityProfiles.RegisterRequestProfile">
+            <summary>
+            модель регистрации приложения -> сервиса
+            </summary>
+        </member>
+        <member name="T:Cars.Api.Controllers.Users.Models.ChangeRoleRequest">
+            <summary>
+            запроса на изменение роли
+            </summary>
+        </member>
+        <member name="P:Cars.Api.Controllers.Users.Models.ChangeRoleRequest.Role">
+            <summary>
+            роль
+            </summary>
+        </member>
+        <member name="T:Cars.Api.Controllers.Users.Models.UpdateUserRequest">
+            <summary>
+            модель запроса на редактирование
+            </summary>
+        </member>
+        <member name="P:Cars.Api.Controllers.Users.Models.UpdateUserRequest.Name">
+            <summary>
+            имя
+            </summary>
+        </member>
+        <member name="P:Cars.Api.Controllers.Users.Models.UpdateUserRequest.Surname">
+            <summary>
+            фамилия
+            </summary>
+        </member>
+        <member name="P:Cars.Api.Controllers.Users.Models.UpdateUserRequest.Patronymic">
+            <summary>
+            отчество
+            </summary>
+        </member>
+        <member name="P:Cars.Api.Controllers.Users.Models.UpdateUserRequest.BirthDate">
+            <summary>
+            дата рождения
+            </summary>
+        </member>
+        <member name="T:Cars.Api.Controllers.Users.Models.UserResponse">
+            <summary>
+            модель ответа на запрос на получение пользователя
+            </summary>
+        </member>
+        <member name="P:Cars.Api.Controllers.Users.Models.UserResponse.Id">
+            <summary>
+            id пользователя
+            </summary>
+        </member>
+        <member name="P:Cars.Api.Controllers.Users.Models.UserResponse.FullName">
+            <summary>
+            ФИО
+            </summary>
+        </member>
+        <member name="P:Cars.Api.Controllers.Users.Models.UserResponse.Email">
+            <summary>
+            почта (логин)
+            </summary>
+        </member>
+        <member name="P:Cars.Api.Controllers.Users.Models.UserResponse.BirthDate">
+            <summary>
+            Дата рождения
+            </summary>
+        </member>
+        <member name="P:Cars.Api.Controllers.Users.Models.UserResponse.Role">
+            <summary>
+            Роль
+            </summary>
+        </member>
+        <member name="T:Cars.Api.Controllers.Users.Profiles.UserProfiles.UserResponseProfile">
+            <summary>
+            маппинг (модель пользователя из сервиса  -> модель ответа клиенту)
+            </summary>
+        </member>
+        <member name="T:Cars.Api.Controllers.Users.Profiles.UserProfiles.UpdateUserRequestProfile">
+            <summary>
+            маппинг (модель пользователя из сервиса  -> клиентская модель запроса на изменение)
+            (клиентская модель запроса на изменение  -> модель запроса к сервису)
+            </summary>
+        </member>
+        <member name="T:Cars.Api.Controllers.Users.UsersController">
+            <summary>
+            контроллер работы с пользователями
+            </summary>
+        </member>
+        <member name="M:Cars.Api.Controllers.Users.UsersController.#ctor(LearnProject.BLL.Contracts.IUserService,AutoMapper.IMapper)">
+            <summary>
+            конструктор контроллера
+            </summary>
+            <param name="service"></param>
+            <param name="mapper"></param>
+        </member>
+        <member name="M:Cars.Api.Controllers.Users.UsersController.GetUsers(System.Int32,System.Int32)">
+            <summary>
+            получение пользователей
+            </summary>
+            <param name="offset">смещение</param>
+            <param name="limit">макс. значение</param>
+        </member>
+        <member name="M:Cars.Api.Controllers.Users.UsersController.UpdateUser(System.String,Cars.Api.Controllers.Users.Models.UpdateUserRequest)">
+            <summary>
+            изменение пользователя
+            </summary>
+            <param name="request">модель запроса на изменение</param>
+            <param name="id">id пользователя</param>
+        </member>
+        <member name="M:Cars.Api.Controllers.Users.UsersController.ChangeUserRole(System.String,System.String)">
+            <summary>
+            смена роли пользователя
+            </summary>
+            <param name="id">id пользователя</param>
+            <param name="newRole">название новой роли</param>
+        </member>
+        <member name="T:Cars.Api.Exceptions.ProcessException">
+            <summary>
+            тип ошибки для возврата стандартизованного ProblemDetails
+            </summary>
+        </member>
+        <member name="P:Cars.Api.Exceptions.ProcessException.Details">
+            <summary>
+            детали ошибки
+            </summary>
+        </member>
+        <member name="M:Cars.Api.Exceptions.ProcessException.#ctor(Cars.Api.Exceptions.ProcessProblemDetails)">
+            <summary>
+            конструктор
+            </summary>
+            <param name="details"></param>
+        </member>
+        <member name="T:Cars.Api.Exceptions.ProcessProblemDetails">
+            <summary>
+            обертка над ProblemDetails со списком ошибок
+            </summary>
+        </member>
+        <member name="P:Cars.Api.Exceptions.ProcessProblemDetails.Errors">
+            <summary>
+            ошибки
+            </summary>
+        </member>
+        <member name="T:Cars.Api.Middleware.ExceptionMiddleware">
+            <summary>
+            промежутное ПО обработки ошибок
+            </summary>
+        </member>
+        <member name="M:Cars.Api.Middleware.ExceptionMiddleware.#ctor(Microsoft.AspNetCore.Http.RequestDelegate)">
+            <summary>
+            конструктор
+            </summary>
+            <param name="next">сл. часть конвейера</param>
+        </member>
+        <member name="M:Cars.Api.Middleware.ExceptionMiddleware.InvokeAsync(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            метод middleware
+            </summary>
+        </member>
+    </members>
+</doc>

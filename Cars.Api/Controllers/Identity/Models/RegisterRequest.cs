@@ -1,27 +1,28 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Cars.Api.Controllers.Users.Models
+namespace Cars.Api.Controllers.Identity.Models
 {
     /// <summary>
     /// модель запроса для регистрации
     /// </summary>
     public class RegisterRequest
     {
+        /// <summary>
+        /// почта/логин
+        /// </summary>
         [Required]
         [EmailAddress]
         [Display(Name = "Email")]
         public required string Email { get; set; }
 
+        /// <summary>
+        /// пароль
+        /// </summary>
         [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public required string Password { get; set; }
-
-        [DataType(DataType.Password)]
-        [Display(Name = "Confirm password")]
-        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
-        public required string ConfirmPassword { get; set; }
 
         /// <summary>
         /// имя
@@ -51,14 +52,27 @@ namespace Cars.Api.Controllers.Users.Models
         public DateOnly BirthDate { get; set; }
     }
 
+    /// <summary>
+    /// проверка введенной даты на сервере
+    /// </summary>
     public class DateRange : ValidationAttribute
     {
         DateOnly MinDate;
 
+        /// <summary>
+        /// конструктор
+        /// </summary>
+        /// <param name="minDate"></param>
         public DateRange(string minDate)
         {
             MinDate = DateOnly.Parse(minDate);
         }
+
+        /// <summary>
+        /// проверка на адекватную дату
+        /// </summary>
+        /// <param name="value">дата</param>
+        /// <param name="validationContext"></param>
         protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
             var d = (DateOnly)value!;

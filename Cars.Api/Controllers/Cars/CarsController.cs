@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Cars.Api.Controllers.Cars
 {
+    /// <summary>
+    /// контроллер машин
+    /// </summary>
     [ApiController]
     [Authorize(Policy = AppPolicies.ViewCars)]
     [Route("api/[controller]")]
@@ -77,6 +80,7 @@ namespace Cars.Api.Controllers.Cars
         /// попытка редактирования
         /// </summary>
         /// <param name="id">id машины</param>
+        /// <param name="request">модель запроса</param>
         [HttpPut("{id}")]
         [Authorize(Policy = AppPolicies.EditCars)]
         public async Task<IActionResult> UpdateCar(int id, UpdateCarRequest request)

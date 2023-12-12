@@ -1,18 +1,27 @@
 ﻿using Cars.Api.Exceptions;
-using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
 namespace Cars.Api.Middleware
 {
+    /// <summary>
+    /// промежутное ПО обработки ошибок
+    /// </summary>
     public class ExceptionMiddleware
     {
         private readonly RequestDelegate next;
 
+        /// <summary>
+        /// конструктор
+        /// </summary>
+        /// <param name="next">сл. часть конвейера</param>
         public ExceptionMiddleware(RequestDelegate next)
         {
             this.next = next;
         }
 
+        /// <summary>
+        /// метод middleware
+        /// </summary>
         public async Task InvokeAsync(HttpContext context)
         {
             ProcessProblemDetails? response = null;

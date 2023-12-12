@@ -8,8 +8,7 @@ namespace Cars.Api.Configuration
         /// <summary>
         /// метод расширения для добавления политик
         /// </summary>
-        /// <param name="services">коллекция DI</param>
-        /// <returns>коллекция DI</returns>
+        /// <param name="options">объект настроек авторизации</param>
         internal static void AddAppPolicies(this AuthorizationOptions options)
         {
             options.AddPolicy(AppPolicies.ViewCars, policy => policy.RequireRole(AppRoles.Manager, AppRoles.Admin, AppRoles.SuperUser, AppRoles.User));

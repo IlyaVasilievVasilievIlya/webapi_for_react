@@ -1,5 +1,6 @@
 ﻿using LearnProject.BLL.Contracts;
 using LearnProject.BLL.Services;
+using LearnProject.BLL.Services.Services;
 using LearnProject.Data.DAL.Repositories;
 using LearnProject.Data.MigrationService;
 using LearnProject.Domain.Repositories;
@@ -19,6 +20,7 @@ namespace Cars.Api.Configuration
             services.AddScoped<ICarModelRepository, CarModelRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IMigrationService, MigrationService>();
+            services.AddScoped<IIdentityService, IdentityService>();
 
             services.AddScoped<ICarService, CarService>();
             services.AddScoped<IUserService, UserService>();

@@ -5,21 +5,27 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <InvariantGlobalization>true</InvariantGlobalization>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <DocumentationFile>C:\Users\ilyaVasilev\Documents\LearnProject\learnproject_vasiliev_webapi\Cars.Api\api.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\learnproject_vasilev\BLL\LearnProject.BLL.Contracts\LearnProject.BLL.Contracts.csproj" />
-    <ProjectReference Include="..\..\learnproject_vasilev\BLL\LearnProject.BLL.Services\LearnProject.BLL.Services.csproj" />
-    <ProjectReference Include="..\..\learnproject_vasilev\Infrastructure\Data\LearnProject.Data.DAL\LearnProject.Data.DAL.csproj" />
-    <ProjectReference Include="..\..\learnproject_vasilev\Infrastructure\Data\LearnProject.Data.MigrationService\LearnProject.Data.MigrationService.csproj" />
-    <ProjectReference Include="..\..\learnproject_vasilev\LearnProject.Shared\LearnProject.Shared.Common\LearnProject.Shared.Common.csproj" />
+    <ProjectReference Include="..\BLL\LearnProject.BLL.Contracts\LearnProject.BLL.Contracts.csproj" />
+    <ProjectReference Include="..\BLL\LearnProject.BLL.Services\LearnProject.BLL.Services.csproj" />
+    <ProjectReference Include="..\Infrastructure\Data\LearnProject.Data.DAL\LearnProject.Data.DAL.csproj" />
+    <ProjectReference Include="..\Infrastructure\Data\LearnProject.Data.MigrationService\LearnProject.Data.MigrationService.csproj" />
+    <ProjectReference Include="..\LearnProject.Shared\LearnProject.Shared.Common\LearnProject.Shared.Common.csproj" />
   </ItemGroup>
 
 </Project>

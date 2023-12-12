@@ -2,6 +2,9 @@
 
 namespace Cars.Api.Controllers.Users.Models
 {
+    /// <summary>
+    /// запроса на изменение роли
+    /// </summary>
     public class ChangeRoleRequest
     {
         /// <summary>

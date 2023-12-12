@@ -1,16 +1,16 @@
 ﻿using AutoMapper;
 using Cars.Api.Controllers.Users.Models;
-using Cars.Api.Exceptions;
 using LearnProject.BLL.Contracts;
 using LearnProject.BLL.Contracts.Models;
 using LearnProject.Shared.Common;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Data;
 
 namespace Cars.Api.Controllers.Users
 {
+    /// <summary>
+    /// контроллер работы с пользователями
+    /// </summary>
     [ApiController]
     [Authorize(Policy = AppPolicies.ViewUsers)]
     [Route("api/[controller]")]
@@ -19,19 +19,23 @@ namespace Cars.Api.Controllers.Users
     {
         readonly IMapper mapper;
         readonly IUserService service;
-        readonly ILogger logger;
 
-
-        public UsersController(IUserService service, IMapper mapper, ILogger logger)
+        /// <summary>
+        /// конструктор контроллера
+        /// </summary>
+        /// <param name="service"></param>
+        /// <param name="mapper"></param>
+        public UsersController(IUserService service, IMapper mapper)
         {
             this.mapper = mapper;
             this.service = service;
-            this.logger = logger;
         }
 
         /// <summary>
         /// получение пользователей
         /// </summary>
+        /// <param name="offset">смещение</param>
+        /// <param name="limit">макс. значение</param>
         [HttpGet("")]
         public async Task<IEnumerable<UserResponse>> GetUsers(int offset = 0, int limit = 10)
         {
@@ -42,53 +46,9 @@ namespace Cars.Api.Controllers.Users
         }
 
         /// <summary>
-        /// регистрация
-        /// </summary>
-        [HttpPost("")]
-        [AllowAnonymous]
-        public async Task<IActionResult> Register(RegisterRequest request)
-        {
-            var model = mapper.Map<AddUserModel>(request);
-            model.Role = AppRoles.User.ToUpper();
-
-            ServiceResponse<IdentityResult> response = await service.Register(model);
-
-            if (!response.IsSuccessful)
-            {
-                logger.LogInformation("Cannot register user {Email}.", model.Email);
-                throw new ProcessException(new ProcessProblemDetails() { Errors = response?.Value?.Errors.Select(er => er.Description).ToList()});
-            }
-
-            logger.LogInformation("User {Email} created a new account with password.", model.Email);
-
-            return Ok();
-        }
-
-        ///// <summary>
-        ///// регистрация
-        ///// </summary>
-        //[HttpPost("")]
-        //[AllowAnonymous]
-        //public async Task<IActionResult> LogIn(LoginRequest request)
-        //{
-        //    LoginUserModel model = mapper.Map<LoginUserModel>(request);
-
-        //    ServiceResponse<SignInResult> response = await service.LogIn(model);
-
-        //    if (!response.IsSuccessful)
-        //    {
-        //        logger.LogInformation("Invalid login attempt.");
-        //        throw new ProcessException(new ProcessProblemDetails() { Errors = { response?.Value?.ToString() ?? string.Empty  } }); //TODO 
-        //    }
-
-        //    logger.LogInformation("User {Email} logged in.", model.Email);
-
-        //    return Ok();
-        //}
-
-        /// <summary>
         /// изменение пользователя
         /// </summary>
+        /// <param name="request">модель запроса на изменение</param>
         /// <param name="id">id пользователя</param>
         [HttpPut("{id}")]
         [Authorize(Policy = AppPolicies.EditUsers)]
@@ -112,6 +72,7 @@ namespace Cars.Api.Controllers.Users
         /// <param name="id">id пользователя</param>
         /// <param name="newRole">название новой роли</param>
         [Authorize(Policy = AppPolicies.EditRoles)]
+        [HttpPut("{id}/editRole")]
         public async Task<IActionResult> ChangeUserRole(string id, string newRole)
         {
             ServiceResponse<int> response = await service.ChangeRoleAsync(id, newRole);
