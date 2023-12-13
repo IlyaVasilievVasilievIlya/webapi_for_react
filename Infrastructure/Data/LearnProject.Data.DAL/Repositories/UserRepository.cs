@@ -149,8 +149,13 @@ namespace LearnProject.Data.DAL.Repositories
 
         public async Task AddRefreshTokenAsync(RefreshToken refreshToken)
         {
+            var oldToken = context.RefreshTokens.Where(token => token.UserId == refreshToken.UserId).FirstOrDefault();
+            if (oldToken != null)
+            {
+                context.RefreshTokens.Remove(oldToken);
+            }
             await context.RefreshTokens.AddAsync(refreshToken);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
     }
 }

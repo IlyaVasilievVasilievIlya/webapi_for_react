@@ -23,8 +23,6 @@ services.AddDbContext<RepositoryAppDbContext>(
     options => options.UseNpgsql(configuration.GetConnectionString("Postgres")));
 
 
-services.Configure<JwtSettings>(configuration.GetSection(nameof(JwtSettings)));
-
 services.AddIdentityCore<User>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<RepositoryAppDbContext>();

@@ -1,7 +1,7 @@
 ﻿namespace Cars.Api.Exceptions
 {
     /// <summary>
-    /// тип ошибки для возврата стандартизованного ProblemDetails
+    /// тип ошибки для возврата стандартизованного ProblemDetails (возможно наследовать для уточнения ошибки)
     /// </summary>
     public class ProcessException : Exception
     {

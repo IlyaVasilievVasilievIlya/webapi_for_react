@@ -9,30 +9,30 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
 namespace LearnProject.BLL.Services.Services
 {
+    /// <summary>
+    /// сервис аутентификации
+    /// </summary>
     public class IdentityService : IIdentityService
     {
         readonly IUserRepository userRepository;
         readonly IMapper mapper;
         readonly ILogger<IdentityService> logger;
         readonly IOptions<JwtSettings> jwtSettings;
-        readonly TokenValidationParameters tokenParameters;
         readonly UserManager<User> userManager;
 
         public IdentityService(IUserRepository userRepository, IMapper mapper, ILogger<IdentityService> logger,
-            IOptions<JwtSettings> jwtSetttings, TokenValidationParameters tokenParameters,
+            IOptions<JwtSettings> jwtSetttings,
             UserManager<User> userManager)
         {
             this.userRepository = userRepository;
             this.mapper = mapper;
             this.logger = logger;
             this.jwtSettings = jwtSetttings;
-            this.tokenParameters = tokenParameters;
             this.userManager = userManager;
         }
 
@@ -65,6 +65,8 @@ namespace LearnProject.BLL.Services.Services
             {
                 { "role", role }
             };
+
+            logger.LogInformation("the user {Email} is logged into the application.", existingUser.Email);
 
             return await CreateAuthenticationResultAsync(existingUser, claims);
         }
@@ -100,6 +102,8 @@ namespace LearnProject.BLL.Services.Services
             {
                 { "role", AppRoles.User }
             };
+
+            logger.LogInformation("User {Email} created a new account with password.", user.Email);
 
             return await CreateAuthenticationResultAsync(user, claims);
         }
@@ -139,52 +143,16 @@ namespace LearnProject.BLL.Services.Services
 
             var jwt = tokenHandler.WriteToken(token);
 
-            logger.LogInformation("User {Email} created a new account with password.", user.Email);
             return AuthenticationResult.CreateSuccessfulResponse(jwt, refreshToken.Token!);
-        }
-
-        /// <summary>
-        /// провалидировать токен
-        /// </summary>
-        /// <param name="token">токен доступа</param>
-        /// <returns>ClaimsPrincipal объект</returns>
-        public ClaimsPrincipal? GetPrincipalFromToken(string token)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            ClaimsPrincipal claimsPrincipal;
-            try
-            {
-                tokenParameters.ValidateLifetime = false;
-                claimsPrincipal = tokenHandler.ValidateToken(token, tokenParameters, out SecurityToken validatedToken);
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-            finally
-            {
-                tokenParameters.ValidateLifetime = true;
-            }
-
-            return claimsPrincipal;
         }
 
         /// <summary>
         /// обновление токена
         /// </summary>
-        /// <param name="token">токен доступа</param>
-        /// <param name="refreshToken">refresh токен</param>
+        /// <param name="model">модель обновления токена</param>
         public async Task<AuthenticationResult> RefreshTokenAsync(RefreshTokenUserModel model)
         {
-            var validatedToken = GetPrincipalFromToken(model.AccessToken);
-
-            if (validatedToken == null)
-            {
-                return AuthenticationResult.CreateFailedResponse(new List<string> { "token is invalid" });
-            }
-
             var storedRefreshToken = await userRepository.ReadRefreshTokenAsync(model.RefreshToken);
-
 
             if (storedRefreshToken == null)
             {
@@ -210,6 +178,7 @@ namespace LearnProject.BLL.Services.Services
 
             return await CreateAuthenticationResultAsync(user.User, claims);
         }
+
         string GenerateRefreshToken()
         {
             var randomNumber = new byte[32];
@@ -219,6 +188,5 @@ namespace LearnProject.BLL.Services.Services
                 return Convert.ToBase64String(randomNumber);
             }
         }
-
     }
 }

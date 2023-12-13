@@ -30,7 +30,7 @@ public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
             .HasComment("user id");
 
         builder.HasOne(e => e.User)
-            .WithMany()
-            .HasForeignKey(e => e.UserId);
+            .WithOne()
+            .HasForeignKey<RefreshToken>(e => e.UserId);
     }
 }

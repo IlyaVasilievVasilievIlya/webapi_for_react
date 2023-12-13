@@ -72,7 +72,7 @@ namespace Cars.Api.Controllers.Users
         /// <param name="id">id пользователя</param>
         /// <param name="newRole">название новой роли</param>
         [Authorize(Policy = AppPolicies.EditRoles)]
-        [HttpPut("{id}/editRole")]
+        [HttpPatch("{id}/role")]
         public async Task<IActionResult> ChangeUserRole(string id, string newRole)
         {
             ServiceResponse<int> response = await service.ChangeRoleAsync(id, newRole);

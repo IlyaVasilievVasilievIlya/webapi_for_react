@@ -8,26 +8,26 @@
         /// <summary>
         /// издатель
         /// </summary>
-        public required string Issuer { get; set; }
+        public string Issuer { get; set; } = "carsApiIdentity";
 
         /// <summary>
         /// получатель
         /// </summary>
-        public required string Audience { get; set; }
+        public string Audience { get; set; } = "carsApi";
 
         /// <summary>
         /// секретный ключ
         /// </summary>
-        public required string Key { get; set; }
+        public string Key { get; set; } = "qwertyqwertyqwertyqwertyqwertyqwerty";
 
         /// <summary>
         /// время жизни токена доступа
         /// </summary>
-        public required TimeSpan TokenLifetime { get; set; }
+        public TimeSpan TokenLifetime { get; set; } = new TimeSpan(0, 5, 0);
 
         /// <summary>
         /// время жизни токена refresh
         /// </summary>
-        public required TimeSpan RefreshTokenLifetime { get; set; }
+        public TimeSpan RefreshTokenLifetime { get; set; } = new TimeSpan(20, 0, 0);
     }
 }

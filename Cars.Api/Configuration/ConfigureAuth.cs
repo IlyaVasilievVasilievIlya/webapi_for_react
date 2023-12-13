@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using LearnProject.Shared.Common;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -14,11 +16,17 @@ namespace Cars.Api.Configuration
         /// <returns>коллекция сервисов</returns>
         internal static IServiceCollection AddAppAuth(this IServiceCollection services, ConfigurationManager configuration)
         {
+            var settings = new JwtSettings();
+            var section = configuration.GetSection(nameof(JwtSettings));
+            services.Configure<JwtSettings>(section);
+            section.Bind(settings);
+
             var tokenValidationParameters = new TokenValidationParameters
             {
-                ValidIssuer = configuration["JwtSettings:Issuer"],
-                ValidAudience = configuration["JwtSettings:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"])),
+
+                ValidIssuer = settings.Issuer, 
+                ValidAudience = settings.Audience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.Key)),
                 ValidateIssuer = true,
                 ValidateAudience = true,
                 ValidateLifetime = true,
@@ -26,7 +34,6 @@ namespace Cars.Api.Configuration
                 ClockSkew = TimeSpan.Zero
             };
 
-            services.AddSingleton(tokenValidationParameters);
 
             services.AddAuthentication(options =>
             {

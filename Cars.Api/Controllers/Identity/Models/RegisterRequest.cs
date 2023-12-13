@@ -57,7 +57,7 @@ namespace Cars.Api.Controllers.Identity.Models
     /// </summary>
     public class DateRange : ValidationAttribute
     {
-        DateOnly MinDate;
+        readonly DateOnly minDate;
 
         /// <summary>
         /// конструктор
@@ -65,18 +65,18 @@ namespace Cars.Api.Controllers.Identity.Models
         /// <param name="minDate"></param>
         public DateRange(string minDate)
         {
-            MinDate = DateOnly.Parse(minDate);
+            this.minDate = DateOnly.Parse(minDate);
         }
 
         /// <summary>
         /// проверка на адекватную дату
         /// </summary>
         /// <param name="value">дата</param>
-        /// <param name="validationContext"></param>
+        /// <param name="validationContext">контект валидации</param>
         protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
             var d = (DateOnly)value!;
-            if (d < MinDate || d > DateOnly.FromDateTime(DateTime.Now))
+            if (d < minDate || d > DateOnly.FromDateTime(DateTime.Now))
                 return new ValidationResult(ErrorMessage);
             else
                 return ValidationResult.Success;

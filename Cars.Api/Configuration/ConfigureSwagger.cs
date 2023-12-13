@@ -11,6 +11,12 @@ namespace Cars.Api.Configuration
         {
             services.AddSwaggerGen(options =>
             {
+                options.MapType<DateOnly>(() => new OpenApiSchema
+                {
+                    Type = "string",
+                    Format = "date"
+                });
+
                 var xmlFilename = $"api.xml";
                 options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 
