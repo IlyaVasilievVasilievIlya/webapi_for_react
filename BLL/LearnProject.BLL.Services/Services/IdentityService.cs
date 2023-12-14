@@ -41,14 +41,14 @@ namespace LearnProject.BLL.Services.Services
         /// </summary>
         /// <param name="model">модель данных для входа</param>
         /// <returns>ответ с моделью AuthenticationResult</returns>
-        public async Task<AuthenticationResult> LogInAsync(LoginUserModel model)
+        public async Task<AuthenticationResponse> LogInAsync(LoginUserModel model)
         {
             var existingUser = await userManager.FindByEmailAsync(model.Email);
 
             if (existingUser == null)
             {
                 logger.LogInformation("Cannot login user {Email}.", model.Email);
-                return AuthenticationResult.CreateFailedResponse(new List<string> { "user doesnt exist" });
+                return  AuthenticationResponse.CreateFailedResponse(AuthenticationResult.UserDoesNotExist, new List<string> { "user doesnt exist" });
             }
 
             var checkPassword = await userManager.CheckPasswordAsync(existingUser, model.Password);
@@ -56,7 +56,7 @@ namespace LearnProject.BLL.Services.Services
             if (!checkPassword)
             {
                 logger.LogInformation("Cannot login user {Email}.", model.Email);
-                return AuthenticationResult.CreateFailedResponse(new List<string> { "invalid password" });
+                return AuthenticationResponse.CreateFailedResponse(AuthenticationResult.InvalidPasswordWhileLogin, new List<string> { "invalid password" });
             }
 
             var role = (await userRepository.ReadWithRoleAsync(existingUser.Id)).Role;
@@ -76,14 +76,14 @@ namespace LearnProject.BLL.Services.Services
         /// </summary>
         /// <param name="model">модель добавления пользователя</param>
         /// <returns>ответ с моделью AuthenticationResult</returns>
-        public async Task<AuthenticationResult> RegisterAsync(RegisterUserModel model)
+        public async Task<AuthenticationResponse> RegisterAsync(RegisterUserModel model)
         {
             var existingUser = await userManager.FindByEmailAsync(model.Email);
 
             if (existingUser != null)
             {
                 logger.LogInformation("Cannot register user {Email}.", model.Email);
-                return AuthenticationResult.CreateFailedResponse(new List<string> { "user already exists" });
+                return AuthenticationResponse.CreateFailedResponse(AuthenticationResult.UserAlreadyExists, new List<string> { "user already exists" });
             }
 
             User user = mapper.Map<User>(model);
@@ -93,7 +93,7 @@ namespace LearnProject.BLL.Services.Services
             if (!result.Succeeded)
             {
                 logger.LogInformation("Cannot register user {Email}.", model.Email);
-                return AuthenticationResult.CreateFailedResponse(result.Errors.Select(error => error.Description).ToList());
+                return AuthenticationResponse.CreateFailedResponse(AuthenticationResult.RegistrationFailed, result.Errors.Select(error => error.Description).ToList());
             }
 
             await userManager.AddToRoleAsync(user, AppRoles.User);
@@ -114,7 +114,7 @@ namespace LearnProject.BLL.Services.Services
         /// <param name="user">сущность пользователя</param>
         /// <param name="claims">клеймы пользоватляеля</param>
         /// <returns></returns>
-        async Task<AuthenticationResult> CreateAuthenticationResultAsync(User user, IDictionary<string, object> claims)
+        async Task<AuthenticationResponse> CreateAuthenticationResultAsync(User user, IDictionary<string, object> claims)
         {
             var settings = jwtSettings.Value;
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -143,32 +143,32 @@ namespace LearnProject.BLL.Services.Services
 
             var jwt = tokenHandler.WriteToken(token);
 
-            return AuthenticationResult.CreateSuccessfulResponse(jwt, refreshToken.Token!);
+            return AuthenticationResponse.CreateSuccessfulResponse(jwt, refreshToken.Token!);
         }
 
         /// <summary>
         /// обновление токена
         /// </summary>
         /// <param name="model">модель обновления токена</param>
-        public async Task<AuthenticationResult> RefreshTokenAsync(RefreshTokenUserModel model)
+        public async Task<AuthenticationResponse> RefreshTokenAsync(RefreshTokenUserModel model)
         {
             var storedRefreshToken = await userRepository.ReadRefreshTokenAsync(model.RefreshToken);
 
             if (storedRefreshToken == null)
             {
-                return AuthenticationResult.CreateFailedResponse(new List<string> { "refresh token not found" });
+                return AuthenticationResponse.CreateFailedResponse(AuthenticationResult.RefreshingTokenFailed, new List<string> { "refresh token not found" });
             }
 
             if (DateTime.UtcNow > storedRefreshToken.ExpiryDate)
             {
-                return AuthenticationResult.CreateFailedResponse(new List<string> { "refresh token expired" });
+                return AuthenticationResponse.CreateFailedResponse(AuthenticationResult.RefreshingTokenFailed, new List<string> { "refresh token expired" });
             }
 
             var user = await userRepository.ReadWithRoleAsync(storedRefreshToken.UserId);
 
             if (user == null)
             {
-                return AuthenticationResult.CreateFailedResponse(new List<string> { "user with refresh token doesnt exists" });
+                return AuthenticationResponse.CreateFailedResponse(AuthenticationResult.RefreshingTokenFailed, new List<string> { "user with refresh token doesnt exists" });
             }
 
             IDictionary<string, object> claims = new Dictionary<string, object>

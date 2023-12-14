@@ -32,13 +32,18 @@ namespace Cars.Api.Controllers.Identity
         /// регистрация
         /// </summary>
         /// <param name="request">модель запроса на регистрацию</param>
-        [HttpPost("register")]
+        [HttpPost("signup")]
         public async Task<IActionResult> Register(RegisterRequest request)
         {
             var model = mapper.Map<RegisterUserModel>(request);
             var authResponse = await identityService.RegisterAsync(model);
 
-            if (!authResponse.IsSuccessful)
+            if(authResponse.Result == AuthenticationResult.RegistrationFailed)
+            {
+                return Unauthorized(authResponse.Errors);
+            }
+
+            if (authResponse.Result == AuthenticationResult.UserAlreadyExists)
             {
                 return BadRequest(authResponse.Errors);
             }
@@ -60,15 +65,20 @@ namespace Cars.Api.Controllers.Identity
             var model = mapper.Map<LoginUserModel>(request);
             var authResponse = await identityService.LogInAsync(model);
 
-            if (!authResponse.IsSuccessful)
+            if (authResponse.Result == AuthenticationResult.UserDoesNotExist)
             {
-                return BadRequest(authResponse.Errors);
+                return Unauthorized(authResponse.Errors);
             }
 
-            return Ok(new TokenGenerationResponse() 
-            { 
-                AccessToken = authResponse.Token!, 
-                RefreshToken = authResponse.RefreshToken! 
+            if (authResponse.Result == AuthenticationResult.InvalidPasswordWhileLogin)
+            {
+                return Unauthorized(authResponse.Errors);
+            }
+
+            return Ok(new TokenGenerationResponse()
+            {
+                AccessToken = authResponse.Token!,
+                RefreshToken = authResponse.RefreshToken!
             });
         }
 
@@ -76,15 +86,15 @@ namespace Cars.Api.Controllers.Identity
         /// перевыпуск токена
         /// </summary>
         /// <param name="request">модель запроса для перевыпуска токенов</param>
-        [HttpPost("login/refresh")]
+        [HttpPost("token/refreshing")]
         public async Task<IActionResult> RefreshToken(TokenRefreshRequest request)
         {
             var model = mapper.Map<RefreshTokenUserModel>(request);
             var authResponse = await identityService.RefreshTokenAsync(model);
 
-            if (!authResponse.IsSuccessful)
+            if (authResponse.Result == AuthenticationResult.RefreshingTokenFailed)
             {
-                return BadRequest(authResponse.Errors);
+                return Unauthorized(authResponse.Errors);
             }
 
             return Ok(new TokenGenerationResponse()
