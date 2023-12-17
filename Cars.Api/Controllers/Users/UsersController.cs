@@ -37,6 +37,7 @@ namespace Cars.Api.Controllers.Users
         /// <param name="offset">смещение</param>
         /// <param name="limit">макс. значение</param>
         [HttpGet("")]
+        [ProducesResponseType(typeof(IEnumerable<UserResponse>), 200)]
         public async Task<IEnumerable<UserResponse>> GetUsers(int offset = 0, int limit = 10)
         {
             var users = await service.GetUsersAsync(offset, limit);
@@ -52,6 +53,8 @@ namespace Cars.Api.Controllers.Users
         /// <param name="id">id пользователя</param>
         [HttpPut("{id}")]
         [Authorize(Policy = AppPolicies.EditUsers)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> UpdateUser(string id, UpdateUserRequest request)
         {
             var model = mapper.Map<UpdateUserModel>(request);
@@ -73,6 +76,8 @@ namespace Cars.Api.Controllers.Users
         /// <param name="newRole">название новой роли</param>
         [Authorize(Policy = AppPolicies.EditRoles)]
         [HttpPatch("{id}/role")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ChangeUserRole(string id, string newRole)
         {
             ServiceResponse<int> response = await service.ChangeRoleAsync(id, newRole);

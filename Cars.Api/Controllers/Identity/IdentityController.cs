@@ -32,6 +32,9 @@ namespace Cars.Api.Controllers.Identity
         /// регистрация
         /// </summary>
         /// <param name="request">модель запроса на регистрацию</param>
+        [ProducesResponseType(typeof(TokenGenerationResponse), 200)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpPost("signup")]
         public async Task<IActionResult> Register(RegisterRequest request)
         {
@@ -60,6 +63,8 @@ namespace Cars.Api.Controllers.Identity
         /// </summary>
         /// <param name="request">модель запроса для входа</param>
         [HttpPost("login")]
+        [ProducesResponseType(typeof(TokenGenerationResponse), 200)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Login(LoginRequest request)
         {
             var model = mapper.Map<LoginUserModel>(request);
@@ -87,6 +92,8 @@ namespace Cars.Api.Controllers.Identity
         /// </summary>
         /// <param name="request">модель запроса для перевыпуска токенов</param>
         [HttpPost("token/refreshing")]
+        [ProducesResponseType(typeof(TokenGenerationResponse), 200)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> RefreshToken(TokenRefreshRequest request)
         {
             var model = mapper.Map<RefreshTokenUserModel>(request);

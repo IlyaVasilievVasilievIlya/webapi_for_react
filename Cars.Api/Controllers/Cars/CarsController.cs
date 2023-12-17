@@ -30,6 +30,7 @@ namespace Cars.Api.Controllers.Cars
         /// получение авто
         /// </summary>
         [HttpGet("")]
+        [ProducesResponseType(typeof(IEnumerable<CarResponse>), 200)]
         public async Task<IEnumerable<CarResponse>> GetCars(int offset = 0, int limit = 10)
         {
             var cars = await service.GetCarsAsync(offset, limit);
@@ -43,6 +44,8 @@ namespace Cars.Api.Controllers.Cars
         /// </summary>
         /// <param name="id">id машины</param>
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(CarResponse), 200)]
+        [ProducesResponseType(404)]
         public async Task<ActionResult<CarResponse>> GetCarById(int id)
         {
             var response = await service.GetCarAsync(id);
@@ -83,6 +86,8 @@ namespace Cars.Api.Controllers.Cars
         /// <param name="request">модель запроса</param>
         [HttpPut("{id}")]
         [Authorize(Policy = AppPolicies.EditCars)]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
         public async Task<IActionResult> UpdateCar(int id, UpdateCarRequest request)
         {
             var model = mapper.Map<UpdateCarModel>(request);
@@ -103,6 +108,8 @@ namespace Cars.Api.Controllers.Cars
         /// <param name="id">id машины</param>
         [HttpDelete("{id}")]
         [Authorize(Policy = AppPolicies.EditCars)]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
         public async Task<IActionResult> DeleteCar(int id)
         {
             ServiceResponse<int> response = await service.DeleteCarAsync(id);
@@ -114,6 +121,5 @@ namespace Cars.Api.Controllers.Cars
 
             return Ok();
         }
-
     }
 }
