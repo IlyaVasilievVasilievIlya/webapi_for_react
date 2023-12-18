@@ -1,6 +1,7 @@
 using LearnProject.Data.DAL.Configuration;
 using LearnProject.Domain.Entities;
 using LearnProject.Shared.Common;
+using LearnProject.Shared.Common.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;

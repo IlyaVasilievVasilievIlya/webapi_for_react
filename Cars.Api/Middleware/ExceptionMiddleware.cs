@@ -29,11 +29,6 @@ namespace Cars.Api.Middleware
             {
                 await next.Invoke(context);
             }
-            catch (ProcessException pe)
-            {
-                response = pe.Details ?? new ProcessProblemDetails() { Title = "unknown error"};
-                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            }
             catch (Exception pe)
             {
                 response = new ProcessProblemDetails() { Title = pe.Message};

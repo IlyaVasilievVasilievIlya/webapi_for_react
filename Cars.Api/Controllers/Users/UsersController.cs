@@ -66,7 +66,7 @@ namespace Cars.Api.Controllers.Users
                 return BadRequest(response.Error);
             }
 
-            return Ok();
+            return NoContent();
         }
 
         /// <summary>
@@ -74,8 +74,8 @@ namespace Cars.Api.Controllers.Users
         /// </summary>
         /// <param name="id">id пользователя</param>
         /// <param name="newRole">название новой роли</param>
-        [Authorize(Policy = AppPolicies.EditRoles)]
         [HttpPatch("{id}/role")]
+        [Authorize(Policy = AppPolicies.EditRoles)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ChangeUserRole(string id, string newRole)
@@ -87,7 +87,7 @@ namespace Cars.Api.Controllers.Users
                 return BadRequest(response.Error);
             }
 
-            return Ok();
+            return NoContent();
         }
     }
 }

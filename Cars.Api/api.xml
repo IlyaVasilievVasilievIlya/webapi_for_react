@@ -372,22 +372,6 @@
             <param name="id">id пользователя</param>
             <param name="newRole">название новой роли</param>
         </member>
-        <member name="T:Cars.Api.Exceptions.ProcessException">
-            <summary>
-            тип ошибки для возврата стандартизованного ProblemDetails (возможно наследовать для уточнения ошибки)
-            </summary>
-        </member>
-        <member name="P:Cars.Api.Exceptions.ProcessException.Details">
-            <summary>
-            детали ошибки
-            </summary>
-        </member>
-        <member name="M:Cars.Api.Exceptions.ProcessException.#ctor(Cars.Api.Exceptions.ProcessProblemDetails)">
-            <summary>
-            конструктор
-            </summary>
-            <param name="details"></param>
-        </member>
         <member name="T:Cars.Api.Exceptions.ProcessProblemDetails">
             <summary>
             обертка над ProblemDetails со списком ошибок

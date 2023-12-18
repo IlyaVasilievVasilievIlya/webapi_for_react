@@ -78,7 +78,7 @@ namespace Cars.Api.Controllers.Cars
                 return BadRequest(response.Error);
             }
 
-            return Ok();
+            return NoContent();
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace Cars.Api.Controllers.Cars
                 return BadRequest(response.Error);
             }
 
-            return Ok();
+            return NoContent();
         }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace Cars.Api.Controllers.Cars
                 return BadRequest(response.Error);
             }
 
-            return Ok();
+            return NoContent();
         }
     }
 }

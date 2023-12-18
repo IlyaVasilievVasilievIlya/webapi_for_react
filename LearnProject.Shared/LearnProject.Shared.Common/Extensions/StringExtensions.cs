@@ -1,8 +1,13 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
-namespace LearnProject.Data.DAL.Configuration
+namespace LearnProject.Shared.Common.Extensions
 {
-    internal static class StringExtensions
+    public static class StringExtensions
     {
         /// <summary>
         /// перевод из CamelCase в snake_case

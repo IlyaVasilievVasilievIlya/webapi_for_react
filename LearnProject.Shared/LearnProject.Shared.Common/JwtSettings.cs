@@ -8,17 +8,17 @@
         /// <summary>
         /// издатель
         /// </summary>
-        public string Issuer { get; set; } = "carsApiIdentity";
+        public string Issuer { get; set; } = string.Empty;
 
         /// <summary>
         /// получатель
         /// </summary>
-        public string Audience { get; set; } = "carsApi";
+        public string Audience { get; set; } = string.Empty;
 
         /// <summary>
         /// секретный ключ
         /// </summary>
-        public string Key { get; set; } = "qwertyqwertyqwertyqwertyqwertyqwerty";
+        public string Key { get; set; } = string.Empty;
 
         /// <summary>
         /// время жизни токена доступа

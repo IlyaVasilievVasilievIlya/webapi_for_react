@@ -48,7 +48,7 @@ namespace LearnProject.BLL.Services.Services
             if (existingUser == null)
             {
                 logger.LogInformation("Cannot login user {Email}.", model.Email);
-                return  AuthenticationResponse.CreateFailedResponse(AuthenticationResult.UserDoesNotExist, new List<string> { "user doesnt exist" });
+                return  AuthenticationResponse.CreateFailedResponse(AuthenticationResult.UserDoesNotExist, new List<string> { "invalid login or password" });
             }
 
             var checkPassword = await userManager.CheckPasswordAsync(existingUser, model.Password);
@@ -56,7 +56,7 @@ namespace LearnProject.BLL.Services.Services
             if (!checkPassword)
             {
                 logger.LogInformation("Cannot login user {Email}.", model.Email);
-                return AuthenticationResponse.CreateFailedResponse(AuthenticationResult.InvalidPasswordWhileLogin, new List<string> { "invalid password" });
+                return AuthenticationResponse.CreateFailedResponse(AuthenticationResult.InvalidPasswordWhileLogin, new List<string> { "invalid login or password" });
             }
 
             var role = (await userRepository.ReadWithRoleAsync(existingUser.Id)).Role;

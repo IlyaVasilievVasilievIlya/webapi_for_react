@@ -18,7 +18,7 @@
         /// <summary>
         /// навигационное свойство
         /// </summary>
-        public CarModel CarModel { get; set; }
+        public CarModel? CarModel { get; set; }
 
         /// <summary>
         /// цвет машины
