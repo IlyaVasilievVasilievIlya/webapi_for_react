@@ -45,7 +45,7 @@ namespace Cars.Api.Controllers.Cars
         /// <param name="id">id машины</param>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(CarResponse), 200)]
-        [ProducesResponseType(404)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<CarResponse>> GetCarById(int id)
         {
             var response = await service.GetCarAsync(id);
@@ -65,6 +65,8 @@ namespace Cars.Api.Controllers.Cars
         /// </summary>
         [HttpPost("")]
         [Authorize(Policy = AppPolicies.EditCars)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> AddCar(AddCarRequest request)
         {
             var model = mapper.Map<AddCarModel>(request);
@@ -86,8 +88,8 @@ namespace Cars.Api.Controllers.Cars
         /// <param name="request">модель запроса</param>
         [HttpPut("{id}")]
         [Authorize(Policy = AppPolicies.EditCars)]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> UpdateCar(int id, UpdateCarRequest request)
         {
             var model = mapper.Map<UpdateCarModel>(request);
@@ -108,8 +110,8 @@ namespace Cars.Api.Controllers.Cars
         /// <param name="id">id машины</param>
         [HttpDelete("{id}")]
         [Authorize(Policy = AppPolicies.EditCars)]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> DeleteCar(int id)
         {
             ServiceResponse<int> response = await service.DeleteCarAsync(id);
