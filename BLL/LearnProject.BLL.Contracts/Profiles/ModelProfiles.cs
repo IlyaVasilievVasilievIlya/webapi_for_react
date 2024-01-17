@@ -12,8 +12,7 @@ namespace LearnProject.BLL.Contracts.Models
         public CarBrandModelProfile()
         {
             CreateMap<CarModel, GetCarBrandModel>()
-                .ForMember(dest => dest.FullName, opt => opt.MapFrom(
-                    src => string.Format("{0} {1}", src.Brand, src.Name)));
+                .ForMember(dest => dest.Model, opt => opt.MapFrom(src => src.Name));
         }
     }
 

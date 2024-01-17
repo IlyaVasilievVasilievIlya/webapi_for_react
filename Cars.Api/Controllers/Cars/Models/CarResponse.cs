@@ -13,12 +13,7 @@
         /// <summary>
         /// марка
         /// </summary>
-        public required string Brand { get; set; }
-
-        /// <summary>
-        /// модель
-        /// </summary>
-        public required string Model { get; set; }
+        public required CarBrandModelResponse Brand { get; set; }
 
         /// <summary>
         /// цвет

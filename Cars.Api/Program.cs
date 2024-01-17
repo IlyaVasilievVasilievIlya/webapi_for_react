@@ -43,6 +43,7 @@ services.AddAppSwagger();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddAppCors();
 
 services.AddAppServices();
 
@@ -53,6 +54,8 @@ services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 var app = builder.Build();
 
 app.ApplyMigrations();
+
+app.UseAppCors();
 
 
 if (app.Environment.IsDevelopment())

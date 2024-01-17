@@ -12,8 +12,7 @@ namespace Cars.Api.Controllers.Cars.Profiles
         public CarResponseProfile()
         {
             CreateMap<GetCarModel, CarResponse>()
-                .ForMember(dest => dest.Brand, opt => opt.MapFrom(src => src.Model.Brand))
-                .ForMember(dest => dest.Model, opt => opt.MapFrom(src => src.Model.Name));
+                .ForMember(dest => dest.Brand, opt => opt.MapFrom(src => src.Model));
         }
     }
 
@@ -36,6 +35,17 @@ namespace Cars.Api.Controllers.Cars.Profiles
         public UpdateCarRequestProfile()
         {
             CreateMap<UpdateCarRequest, UpdateCarModel>();
+        }
+    }
+
+    /// <summary>
+    /// маппинг (модель бренда машины -> модель ответа)
+    /// </summary>
+    public class CarBrandModelResponseProfile : Profile
+    {
+        public CarBrandModelResponseProfile()
+        {
+            CreateMap<GetCarBrandModel, CarBrandModelResponse>();
         }
     }
 }

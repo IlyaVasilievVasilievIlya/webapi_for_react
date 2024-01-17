@@ -1,9 +1,9 @@
-﻿namespace LearnProject.BLL.Contracts.Models
+﻿namespace Cars.Api.Controllers.Cars.Models
 {
     /// <summary>
     /// модель выдаваемая при получении марки авто
     /// </summary>
-    public class GetCarBrandModel
+    public class CarBrandModelResponse
     {
         /// <summary>
         /// id модели

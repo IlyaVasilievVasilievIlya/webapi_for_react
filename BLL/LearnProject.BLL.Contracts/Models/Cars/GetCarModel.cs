@@ -20,7 +20,7 @@ namespace LearnProject.BLL.Contracts.Models
         /// <summary>
         /// навигационное свойство
         /// </summary>
-        public required CarModel Model { get; set; }
+        public required GetCarBrandModel Model { get; set; }
 
         /// <summary>
         /// цвет

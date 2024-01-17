@@ -40,6 +40,19 @@ namespace Cars.Api.Controllers.Cars
         }
 
         /// <summary>
+        /// получение моделей авто
+        /// </summary>
+        [HttpGet("brandModels")]
+        [ProducesResponseType(typeof(IEnumerable<CarBrandModelResponse>), 200)]
+        public async Task<IEnumerable<CarBrandModelResponse>> GetCarBrandModels()
+        {
+            var cars = await service.GetCarBrandModelsAsync();
+            var response = mapper.Map<IEnumerable<CarBrandModelResponse>>(cars);
+
+            return response;
+        }
+
+        /// <summary>
         /// получение авто по id
         /// </summary>
         /// <param name="id">id машины</param>
