@@ -26,7 +26,7 @@
         /// создать сущность
         /// </summary>
         /// <param name="value">сущность</param>
-        Task CreateAsync(T value);
+        Task<T> CreateAsync(T value);
 
         /// <summary>
         /// изменить сущность

@@ -127,7 +127,12 @@ namespace LearnProject.Data.DAL.Repositories
         /// реализация запроса на создание
         /// </summary>
         /// <param name="user">сущность пользователя</param>
-        protected override void CreateImplementation(User user) => context.Users.Add(user);
+        protected override User CreateImplementation(User user)
+        {
+            context.Users.Add(user);
+
+            return user;
+        }
 
         /// <summary>
         /// реализация запроса на редактирование

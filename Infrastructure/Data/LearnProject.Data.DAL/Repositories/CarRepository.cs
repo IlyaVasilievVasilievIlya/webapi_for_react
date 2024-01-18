@@ -60,7 +60,12 @@ namespace LearnProject.Data.DAL.Repositories
         /// пометить авто на добавление
         /// </summary>
         /// <param name="car">сущность машины</param>
-        protected override void CreateImplementation(Car car) => context.Cars.Add(car);
+        protected override Car CreateImplementation(Car car)
+        {
+            context.Cars.Add(car);
+
+            return car;
+        }
         
         /// <summary>
         /// пометить авто на изменение

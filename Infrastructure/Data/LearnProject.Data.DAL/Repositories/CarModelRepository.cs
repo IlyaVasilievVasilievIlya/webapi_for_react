@@ -58,7 +58,10 @@ namespace LearnProject.Data.DAL.Repositories
         /// </summary>
         /// <param name="model"></param>
         /// <exception cref="NotImplementedException"></exception>
-        protected override void CreateImplementation(CarModel model) => context.CarBrandModels.Add(model);
+        protected override CarModel CreateImplementation(CarModel model) {
+            context.CarBrandModels.Add(model);
+            return model;
+        }
 
         /// <summary>
         /// изменение сущности модели авто (добавить)

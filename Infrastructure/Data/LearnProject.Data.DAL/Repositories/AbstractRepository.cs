@@ -39,6 +39,13 @@ namespace LearnProject.Data.DAL.Repositories
             return await body.Invoke();
         }
 
+        protected async Task<TRet> OperationEnvironmentAsync<TRet>(Func<TRet> body)
+        {
+            var result = body.Invoke();
+            await Context.SaveChangesAsync();
+            return result;
+        }
+
         /// <summary>
         /// абстрактный метод реализации запроса на получение сущностей
         /// </summary>
@@ -56,7 +63,7 @@ namespace LearnProject.Data.DAL.Repositories
         /// абстрактный метод реализации запроса на создание сущности
         /// </summary>
         /// <param name="value">сущность</param>
-        protected abstract void CreateImplementation(T value);
+        protected abstract T CreateImplementation(T value);
 
         /// <summary>
         /// абстрактный метод реализации запроса на обновление сущности
@@ -101,9 +108,9 @@ namespace LearnProject.Data.DAL.Repositories
         /// реализация IRepository для создания сущности
         /// </summary>
         /// <param name="value"></param>
-        public async Task CreateAsync(T value)
+        public async Task<T> CreateAsync(T value)
         {
-            await OperationEnvironmentAsync(() => CreateImplementation(value));
+            return await OperationEnvironmentAsync(() => CreateImplementation(value));
         }
 
         /// <summary>

@@ -91,18 +91,20 @@ namespace LearnProject.BLL.Services
         /// </summary>
         /// <param name="carModel">модель для добавления</param>
         /// <returns>модель ответа</returns>
-        public async Task<ServiceResponse<int>> AddCarAsync(AddCarModel carModel)
+        public async Task<ServiceResponse<GetCarModel>> AddCarAsync(AddCarModel carModel)
         {
             var model = await modelRepository.ReadAsync(carModel.CarModelId);
 
             if (model == null)
-                return ServiceResponse<int>.CreateFailedResponse($"Car model with id {carModel.CarModelId} not found");
+                return ServiceResponse<GetCarModel>.CreateFailedResponse($"Car model with id {carModel.CarModelId} not found");
 
             Car car = mapper.Map<Car>(carModel);
 
             await carRepository.CreateAsync(car);
 
-            return ServiceResponse<int>.CreateSuccessfulResponse();
+            GetCarModel value = mapper.Map<GetCarModel>(car);
+
+            return ServiceResponse<GetCarModel>.CreateSuccessfulResponse(value);
         }
 
         /// <summary>

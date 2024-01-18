@@ -80,18 +80,20 @@ namespace Cars.Api.Controllers.Cars
         [Authorize(Policy = AppPolicies.EditCars)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> AddCar(AddCarRequest request)
+        public async Task<ActionResult<CarResponse>> AddCar(AddCarRequest request)
         {
             var model = mapper.Map<AddCarModel>(request);
 
-            ServiceResponse<int> response = await service.AddCarAsync(model);
+            ServiceResponse<GetCarModel> response = await service.AddCarAsync(model);
 
             if (!response.IsSuccessful)
             {
                 return BadRequest(response.Error);
             }
 
-            return NoContent();
+            var carResponse = mapper.Map<CarResponse>(response.Value);
+
+            return carResponse;
         }
 
         /// <summary>

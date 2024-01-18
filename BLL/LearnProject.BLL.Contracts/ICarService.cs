@@ -39,7 +39,7 @@ namespace LearnProject.BLL.Contracts
         /// </summary>
         /// <param name="carModel">модель для добавления</param>
         /// <returns>модель ответа</returns>
-        Task<ServiceResponse<int>> AddCarAsync(AddCarModel car);
+        Task<ServiceResponse<GetCarModel>> AddCarAsync(AddCarModel car);
 
         /// <summary>
         /// изменение авто
