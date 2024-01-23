@@ -78,7 +78,7 @@ namespace Cars.Api.Controllers.Users
         [Authorize(Policy = AppPolicies.EditRoles)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> ChangeUserRole(string id, string newRole)
+        public async Task<IActionResult> ChangeUserRole(string id, [FromBody] string newRole)
         {
             ServiceResponse<int> response = await service.ChangeRoleAsync(id, newRole);
 

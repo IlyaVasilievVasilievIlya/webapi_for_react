@@ -13,10 +13,7 @@ namespace Cars.Api.Controllers.Users.Profiles
         {
             public UserResponseProfile()
             {
-                CreateMap<GetUserModel, UserResponse>()
-                    .ForMember(dest => dest.FullName, opt => 
-                        opt.MapFrom(src => string.Format("{0} {1}{2}", src.Surname, 
-                            src.Name, (src.Patronymic != null) ? $" {src.Patronymic}": "" )));
+                CreateMap<GetUserModel, UserResponse>();
             }
         }
 

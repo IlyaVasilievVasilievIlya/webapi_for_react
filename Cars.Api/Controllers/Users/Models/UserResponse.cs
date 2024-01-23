@@ -11,9 +11,19 @@
         public required string Id { get; set; }
 
         /// <summary>
-        /// ФИО
+        /// Имя
         /// </summary>
-        public required string FullName { get; set; }
+        public required string Name { get; set; }
+        
+        /// <summary>
+        /// Фамилия
+        /// </summary>
+        public required string Surname { get; set; }
+
+        /// <summary>
+        /// Отчество
+        /// </summary>
+        public string? Patronymic { get; set; }
 
         /// <summary>
         /// почта (логин)

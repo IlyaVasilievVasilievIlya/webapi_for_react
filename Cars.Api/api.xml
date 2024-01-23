@@ -350,9 +350,19 @@
             id пользователя
             </summary>
         </member>
-        <member name="P:Cars.Api.Controllers.Users.Models.UserResponse.FullName">
+        <member name="P:Cars.Api.Controllers.Users.Models.UserResponse.Name">
             <summary>
-            ФИО
+            Имя
+            </summary>
+        </member>
+        <member name="P:Cars.Api.Controllers.Users.Models.UserResponse.Surname">
+            <summary>
+            Фамилия
+            </summary>
+        </member>
+        <member name="P:Cars.Api.Controllers.Users.Models.UserResponse.Patronymic">
+            <summary>
+            Отчество
             </summary>
         </member>
         <member name="P:Cars.Api.Controllers.Users.Models.UserResponse.Email">
