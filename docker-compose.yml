@@ -1,0 +1,13 @@
+version: '3.4'
+
+services:
+  carsapi_postgresql:
+    image: postgres
+
+  carsapi_web:
+    image: ${DOCKER_REGISTRY-}carsapiweb
+    build:
+      context: .
+      dockerfile: Cars.Api/Dockerfile
+    depends_on:
+      - carsapi_postgresql
