@@ -115,7 +115,7 @@ namespace LearnProject.Data.DAL
                     NormalizedUserName = "ilyavasilev56@gmail.com".ToUpper(),
                     Email = "ilyavasilev56@gmail.com",
                     NormalizedEmail = "ilyavasilev56@gmail.com".ToUpper(),
-                    PasswordHash = hasher.HashPassword(null, "qwerty")
+                    PasswordHash = hasher.HashPassword(null, "1234!faS")
                 }
             );
 
