@@ -31,7 +31,7 @@ namespace Cars.Api.Controllers.Cars
         /// </summary>
         [HttpGet("")]
         [ProducesResponseType(typeof(IEnumerable<CarResponse>), 200)]
-        public async Task<IEnumerable<CarResponse>> GetCars(int offset = 0, int limit = 10)
+        public async Task<IEnumerable<CarResponse>> GetCars(int offset = 0, int limit = 1000)
         {
             var cars = await service.GetCarsAsync(offset, limit);
             var response = mapper.Map<IEnumerable<CarResponse>>(cars);

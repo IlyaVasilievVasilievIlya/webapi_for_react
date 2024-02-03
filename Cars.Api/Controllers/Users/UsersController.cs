@@ -38,7 +38,7 @@ namespace Cars.Api.Controllers.Users
         /// <param name="limit">макс. значение</param>
         [HttpGet("")]
         [ProducesResponseType(typeof(IEnumerable<UserResponse>), 200)]
-        public async Task<IEnumerable<UserResponse>> GetUsers(int offset = 0, int limit = 10)
+        public async Task<IEnumerable<UserResponse>> GetUsers(int offset = 0, int limit = 1000)
         {
             var users = await service.GetUsersAsync(offset, limit);
             var response = mapper.Map<IEnumerable<UserResponse>>(users);
