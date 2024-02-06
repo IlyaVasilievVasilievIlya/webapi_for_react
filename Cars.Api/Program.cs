@@ -37,6 +37,7 @@ services.AddAppAuth(configuration);
 services.AddAuthorization(options =>
 {
     options.AddAppPolicies();
+
 });
 
 services.AddAppSwagger();

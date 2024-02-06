@@ -44,9 +44,18 @@ namespace Cars.Api.Configuration
                 {
                     options.SaveToken = true;
                     options.TokenValidationParameters = tokenValidationParameters;
-                });
+                })
+            .AddJwtBearer("ExternalJwtScheme", options =>
+            {
+
+                options.TokenHandlers.Clear();
+                options.TokenHandlers.Add(new GoogleTokenValidator());
+
+            });
 
             return services;
         }
     }
+
+
 }
