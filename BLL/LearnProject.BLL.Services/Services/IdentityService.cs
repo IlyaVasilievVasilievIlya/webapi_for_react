@@ -1,14 +1,18 @@
 ﻿using AutoMapper;
+using Google.Apis.Auth;
 using LearnProject.BLL.Contracts;
 using LearnProject.BLL.Contracts.Models;
 using LearnProject.Domain.Entities;
 using LearnProject.Domain.Repositories;
 using LearnProject.Shared.Common;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -23,17 +27,19 @@ namespace LearnProject.BLL.Services.Services
         readonly IMapper mapper;
         readonly ILogger<IdentityService> logger;
         readonly IOptions<JwtSettings> jwtSettings;
+        readonly IConfiguration configuration;
         readonly UserManager<User> userManager;
 
         public IdentityService(IUserRepository userRepository, IMapper mapper, ILogger<IdentityService> logger,
             IOptions<JwtSettings> jwtSetttings,
-            UserManager<User> userManager)
+            UserManager<User> userManager, IConfiguration configuration)
         {
             this.userRepository = userRepository;
             this.mapper = mapper;
             this.logger = logger;
             this.jwtSettings = jwtSetttings;
             this.userManager = userManager;
+            this.configuration = configuration;
         }
 
         /// <summary>
@@ -69,6 +75,68 @@ namespace LearnProject.BLL.Services.Services
             logger.LogInformation("the user {Email} is logged into the application.", existingUser.Email);
 
             return await CreateAuthenticationResultAsync(existingUser, claims);
+        }
+
+        public async Task<AuthenticationResponse> LogInWithGoogleAsync(string token)
+        {
+            var settings = new GoogleJsonWebSignature.ValidationSettings()
+            {
+                Audience = new List<string> { configuration["ExternalProviders:Google:ClientId"] ?? ""}
+            };
+
+            GoogleJsonWebSignature.Payload payload;
+            try
+            {
+                payload = await GoogleJsonWebSignature.ValidateAsync(token, settings);
+            }
+            catch (InvalidJwtException e)
+            {
+                logger.Log(LogLevel.Information, e.Message);
+                return AuthenticationResponse.CreateFailedResponse(AuthenticationResult.TokenValidationFailed,
+                    new List<string> { "Google authentication failed - invalidToken" });
+            }
+
+            var existingUser = await userManager.FindByEmailAsync(payload.Email);
+
+            if (existingUser != null) 
+            {
+                var role = (await userRepository.ReadWithRoleAsync(existingUser.Id)).Role;
+
+                IDictionary<string, object> claims = new Dictionary<string, object>
+                {
+                    { "role", role }
+                };
+
+                logger.Log(LogLevel.Information, "Google authentication succeded");
+
+                return await CreateAuthenticationResultAsync(existingUser, claims);
+            }
+
+            User newUser = new User()
+            {
+                Name = payload.GivenName,
+                Surname = payload.FamilyName,
+                Email = payload.Email
+            };
+
+            var result = await userManager.CreateAsync(newUser);
+
+            if (!result.Succeeded)
+            {
+                logger.LogInformation("Cannot register user {Email}.", payload.Email);
+                return AuthenticationResponse.CreateFailedResponse(AuthenticationResult.RegistrationFailed, result.Errors.Select(error => error.Description).ToList());
+            }
+
+            await userManager.AddToRoleAsync(newUser, AppRoles.User);
+
+            IDictionary<string, object> newUserClaims = new Dictionary<string, object>
+            {
+                { "role", AppRoles.User }
+            };
+
+            logger.Log(LogLevel.Information, "Google authentication succeded");
+
+            return await CreateAuthenticationResultAsync(newUser, newUserClaims);
         }
 
         /// <summary>
@@ -188,5 +256,6 @@ namespace LearnProject.BLL.Services.Services
                 return Convert.ToBase64String(randomNumber);
             }
         }
+
     }
 }

@@ -7,7 +7,8 @@
         RegistrationFailed,
         UserDoesNotExist,
         InvalidPasswordWhileLogin,
-        RefreshingTokenFailed
+        RefreshingTokenFailed,
+        TokenValidationFailed
     }
 
     /// <summary>

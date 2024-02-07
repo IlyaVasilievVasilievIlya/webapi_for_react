@@ -16,11 +16,6 @@ namespace Cars.Api.Configuration
             options.AddPolicy(AppPolicies.ViewUsers, policy => policy.RequireRole(AppRoles.Admin, AppRoles.SuperUser));
             options.AddPolicy(AppPolicies.EditUsers, policy => policy.RequireRole(AppRoles.Admin, AppRoles.SuperUser));
             options.AddPolicy(AppPolicies.EditRoles, policy => policy.RequireRole(AppRoles.SuperUser));
-
-            //константы + можно ли переписать на верхний вид
-            var externalJwtSchemePolicyBuilder = new AuthorizationPolicyBuilder();
-            //указать requirement что только аутентифицированный может войти
-            options.AddPolicy("ExternalJwtScheme", externalJwtSchemePolicyBuilder.RequireAuthenticatedUser().Build());
         }
     }
 }

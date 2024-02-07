@@ -1,7 +1,9 @@
-﻿using LearnProject.Shared.Common;
+﻿using Google.Apis.Auth;
+using LearnProject.Shared.Common;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
 namespace Cars.Api.Configuration
@@ -44,18 +46,8 @@ namespace Cars.Api.Configuration
                 {
                     options.SaveToken = true;
                     options.TokenValidationParameters = tokenValidationParameters;
-                })
-            .AddJwtBearer("ExternalJwtScheme", options =>
-            {
-
-                options.TokenHandlers.Clear();
-                options.TokenHandlers.Add(new GoogleTokenValidator());
-
-            });
-
+                });
             return services;
         }
     }
-
-
 }

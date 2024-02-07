@@ -22,6 +22,11 @@ namespace LearnProject.BLL.Contracts
         Task<AuthenticationResponse> LogInAsync(LoginUserModel model);
 
         /// <summary>
+        /// вход через Google
+        /// </summary>
+        Task<AuthenticationResponse> LogInWithGoogleAsync(string token);
+
+        /// <summary>
         /// обновление refresh токена пользователя
         /// </summary>
         /// <param name="model">модель обновления</param>

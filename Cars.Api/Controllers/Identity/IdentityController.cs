@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using Cars.Api.Controllers.Identity.Models;
+using Google.Apis.Auth;
 using LearnProject.BLL.Contracts;
 using LearnProject.BLL.Contracts.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Cars.Api.Controllers.Identity
@@ -15,6 +17,8 @@ namespace Cars.Api.Controllers.Identity
     {
         readonly IIdentityService identityService;
 
+        readonly ILogger<IdentityController> logger;
+
         readonly IMapper mapper;
 
         /// <summary>
@@ -22,10 +26,11 @@ namespace Cars.Api.Controllers.Identity
         /// </summary>
         /// <param name="identityService">сервис аутентификации</param>
         /// <param name="mapper">маппер</param>
-        public IdentityController(IIdentityService identityService, IMapper mapper)
+        public IdentityController(IIdentityService identityService, IMapper mapper, ILogger<IdentityController> logger)
         {
             this.identityService = identityService;
             this.mapper=mapper; 
+            this.logger = logger;
         }
 
         /// <summary>
@@ -76,6 +81,34 @@ namespace Cars.Api.Controllers.Identity
             }
 
             if (authResponse.Result == AuthenticationResult.InvalidPasswordWhileLogin)
+            {
+                return Unauthorized(authResponse.Errors);
+            }
+
+            return Ok(new TokenGenerationResponse()
+            {
+                AccessToken = authResponse.Token!,
+                RefreshToken = authResponse.RefreshToken!
+            });
+        }
+
+        /// <summary>
+        /// вход через Google
+        /// </summary>
+        /// <param name="token">токен отправленный клиентом</param>
+        [HttpPost("loginWithGoogle")]
+        [ProducesResponseType(typeof(TokenGenerationResponse), 200)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> LoginWithGoogle([FromBody] string token)
+        {
+            var authResponse = await identityService.LogInWithGoogleAsync(token);
+
+            if (authResponse.Result == AuthenticationResult.TokenValidationFailed)
+            {
+                return Unauthorized(authResponse.Errors);
+            }
+
+            if (authResponse.Result == AuthenticationResult.RegistrationFailed)
             {
                 return Unauthorized(authResponse.Errors);
             }

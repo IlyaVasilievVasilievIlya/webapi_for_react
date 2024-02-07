@@ -34,6 +34,7 @@ builder.Services.Configure<IdentityOptions>(options =>
 
 services.AddAppAuth(configuration);
 
+
 services.AddAuthorization(options =>
 {
     options.AddAppPolicies();

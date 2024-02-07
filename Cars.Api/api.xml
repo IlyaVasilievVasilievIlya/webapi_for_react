@@ -167,7 +167,7 @@
             контроллер для работы с токенами
             </summary>
         </member>
-        <member name="M:Cars.Api.Controllers.Identity.IdentityController.#ctor(LearnProject.BLL.Contracts.IIdentityService,AutoMapper.IMapper)">
+        <member name="M:Cars.Api.Controllers.Identity.IdentityController.#ctor(LearnProject.BLL.Contracts.IIdentityService,AutoMapper.IMapper,Microsoft.Extensions.Logging.ILogger{Cars.Api.Controllers.Identity.IdentityController})">
             <summary>
             конструктор контроллера
             </summary>
@@ -185,6 +185,12 @@
             создание токенов
             </summary>
             <param name="request">модель запроса для входа</param>
+        </member>
+        <member name="M:Cars.Api.Controllers.Identity.IdentityController.LoginWithGoogle(System.String)">
+            <summary>
+            вход через Google
+            </summary>
+            <param name="token">токен отправленный клиентом</param>
         </member>
         <member name="M:Cars.Api.Controllers.Identity.IdentityController.RefreshToken(Cars.Api.Controllers.Identity.Models.TokenRefreshRequest)">
             <summary>
