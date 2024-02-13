@@ -28,61 +28,9 @@ namespace LearnProject.Data.DAL.Repositories
             set => context = value;
         }
 
-        /// <summary>
-        /// получить все модели авто
-        /// </summary>
-        /// <param name="offset">смещение</param>
-        /// <param name="limit">лимит</param>
-        /// <returns>коллекция моделей</returns>
-        protected override async Task<IEnumerable<CarModel>> ReadAllImplementationAsync(int offset, int limit)
+        public override Task<CarModel?> FindByKeyAsync(int key)
         {
-            var models = context
-                .CarBrandModels
-                .AsNoTracking();
-
-            return await models.ToListAsync();
+            return FindByCondition(entity => entity.CarModelId == key).AsTracking().FirstOrDefaultAsync();
         }
-
-        /// <summary>
-        /// получить модель авто по id
-        /// </summary>
-        /// <param name="id">id модели машины</param>
-        /// <returns>сущность CarModel (либо null)</returns>
-        protected override async Task<CarModel?> ReadImplementationAsync(int id)
-        {
-            return await context.CarBrandModels.FindAsync(id);
-        }
-
-        /// <summary>
-        /// создание сущности модели авто (добавить)
-        /// </summary>
-        /// <param name="model"></param>
-        /// <exception cref="NotImplementedException"></exception>
-        protected override CarModel CreateImplementation(CarModel model) {
-            context.CarBrandModels.Add(model);
-            return model;
-        }
-
-        /// <summary>
-        /// изменение сущности модели авто (добавить)
-        /// </summary>
-        /// <param name="model">сущность</param>
-        protected override void UpdateImplementation(CarModel model) => context.CarBrandModels.Update(model);
-
-        /// <summary>
-        /// удаление сущности модели авто (добавить)
-        /// </summary>
-        /// <param name="model">сущность</param>
-        protected override void DeleteImplementation(CarModel model) => context.CarBrandModels.Remove(model);
-
-        /// <summary>
-        /// запрос по умолчанию
-        /// </summary>
-        /// <returns>результат запроса</returns>
-        protected override IQueryable<CarModel> QueryImplementation()
-        {
-            return context.CarBrandModels.AsNoTracking();
-        }
-
     }
 }

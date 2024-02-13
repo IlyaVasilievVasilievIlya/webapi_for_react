@@ -14,13 +14,13 @@ namespace LearnProject.Domain.Repositories
         /// <param name="offset">смещение</param>
         /// <param name="limit">макс. количество</param>
         /// <returns>коллекция сущностей</returns>
-        Task<IEnumerable<UserWithRoleModel>> ReadAllWithRolesAsync(int offset = 0, int limit = 1000);
+        PagedList<UserWithRoleModel> ReadAllWithRoles(UserQueryParameters parameters);
 
         /// <summary>
         /// получить все роли пользователей
         /// </summary>
         /// <returns>коллекция ролей string</returns>
-        Task<IEnumerable<string>> ReadAllRolesAsync();
+        IQueryable<string> ReadAllRoles();
 
         /// <summary>
         /// получить пользователя с ролью
@@ -34,7 +34,7 @@ namespace LearnProject.Domain.Repositories
         /// </summary>
         /// <param name="refreshToken">токен</param>
         /// <returns>сущность токена</returns>
-        Task<RefreshToken?> ReadRefreshTokenAsync(string refreshToken);
+        Task<RefreshToken> ReadRefreshTokenAsync(string refreshToken);
 
         /// <summary>
         /// добавить refresh токен

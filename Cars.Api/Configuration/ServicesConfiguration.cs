@@ -4,6 +4,7 @@ using LearnProject.BLL.Services.Services;
 using LearnProject.Data.DAL.Repositories;
 using LearnProject.Data.MigrationService;
 using LearnProject.Domain.Repositories;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Cars.Api.Configuration
 {
@@ -21,6 +22,7 @@ namespace Cars.Api.Configuration
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IMigrationService, MigrationService>();
             services.AddScoped<IIdentityService, IdentityService>();
+            services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
 
             services.AddScoped<ICarService, CarService>();
             services.AddScoped<IUserService, UserService>();

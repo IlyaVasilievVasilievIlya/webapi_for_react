@@ -27,32 +27,6 @@ namespace LearnProject.Data.DAL.Repositories
             set => context = value;
         }
 
-        /// <summary>
-        /// реализация запроса по умолчанию
-        /// </summary>
-        /// <returns>коллекция сущностей User</returns>
-        protected override IQueryable<User> QueryImplementation()
-        {
-            return context.Users.AsNoTracking();
-        }
-
-        /// <summary>
-        /// реализация запроса всех пользователей
-        /// </summary>
-        /// <param name="offset">смещение</param>
-        /// <param name="limit">макс. количество</param>
-        /// <returns>коллекция сущностей User</returns>
-        protected override async Task<IEnumerable<User>> ReadAllImplementationAsync(int offset, int limit)
-        {
-            var users = context.Users
-                .AsNoTracking();
-
-            users = users.OrderBy(user => user.Id)
-                .Skip(Math.Max(offset, 0))
-                .Take(Math.Max(0, limit));
-
-            return await users.ToListAsync();
-        }
 
         /// <summary>
         /// получение пользователей с их ролями
@@ -60,7 +34,7 @@ namespace LearnProject.Data.DAL.Repositories
         /// <param name="offset">смещение</param>
         /// <param name="limit">макс. количество</param>
         /// <returns>коллекция моделей UserWithRoleModel</returns>
-        public async Task<IEnumerable<UserWithRoleModel>> ReadAllWithRolesAsync(int offset = 0, int limit = 1000)
+        public PagedList<UserWithRoleModel> ReadAllWithRoles(UserQueryParameters parameters)
         {
             var userRolesIds = context.UserRoles
                 .AsQueryable()
@@ -77,32 +51,26 @@ namespace LearnProject.Data.DAL.Repositories
             result = result.AsNoTracking()
                 .Where(user => user.Role != AppRoles.SuperUser);
 
-            result = result.OrderBy(user => user.User.Id)
-                .Skip(Math.Max(offset, 0))
-                .Take(Math.Max(0, limit));
-
-            return await result.ToListAsync();
+            return PagedList<UserWithRoleModel>.ToPagedList(result.OrderBy(e => e.User.Id), parameters.PageNumber, parameters.PageSize);
         }
 
-        /// <summary>
-        /// реализация запроса на получение пользователя по id
-        /// </summary>
-        /// <param name="key">id пользователя</param>
-        /// <returns>сущность пользователя либо null</returns>
-        protected override async Task<User?> ReadImplementationAsync(string key) => await context.Users.FindAsync(key);
+        public override Task<User?> FindByKeyAsync(string key)
+        {
+            return FindByCondition(entity => entity.Id == key).AsTracking().FirstOrDefaultAsync();
+        }
 
         /// <summary>
         /// реализация запроса на получение всех ролей
         /// </summary>
         /// <returns>коллекция ролей string</returns>
-        public async Task<IEnumerable<string>> ReadAllRolesAsync()
+        public IQueryable<string> ReadAllRoles()
         {
             var roles = context.Roles
                 .AsNoTracking()
                 .Select(role => role.Name ?? string.Empty)
                 .Where(role => role != AppRoles.SuperUser);
 
-            return await roles.ToListAsync();
+            return roles;
         }
 
         /// <summary>
@@ -112,55 +80,34 @@ namespace LearnProject.Data.DAL.Repositories
         /// <returns>модель ответа</returns>
         public async Task<UserWithRoleModel> ReadWithRoleAsync(string id)
         {
-            var result = context.Users
-                .AsQueryable()
-                .Where(user => user.Id == id)
-                .Join(context.UserRoles.AsQueryable(), user => user.Id, ur => ur.UserId,
-                    (user, userRole) => new { User = user, userRole.RoleId })
+            var user = await FindByKeyAsync(id);
+
+            if (user == null)
+            {
+                throw new Exception("role not found");
+            }
+
+            var role = context.UserRoles.AsQueryable().Where(userRole => userRole.UserId == id)
                 .Join(context.Roles.AsQueryable(), user => user.RoleId, role => role.Id,
-                    (user, role) => new UserWithRoleModel { User = user.User, Role = role.Name ?? "" });
+                    (user, role) => role.Name ?? "" ).First();
 
-            return await result.FirstAsync();
+            return new UserWithRoleModel() { User = user, Role = role};
         }
 
-        /// <summary>
-        /// реализация запроса на создание
-        /// </summary>
-        /// <param name="user">сущность пользователя</param>
-        protected override User CreateImplementation(User user)
-        {
-            context.Users.Add(user);
-
-            return user;
-        }
-
-        /// <summary>
-        /// реализация запроса на редактирование
-        /// </summary>
-        /// <param name="user">сущность пользователя</param>
-        protected override void UpdateImplementation(User user) => context.Users.Update(user);
-
-        /// <summary>
-        /// реализация запроса на удаление
-        /// </summary>
-        /// <param name="user">сущность пользователя</param>
-        protected override void DeleteImplementation(User user) => context.Users.Remove(user);
-
-        public async Task<RefreshToken?> ReadRefreshTokenAsync(string refreshToken)
+        public Task<RefreshToken> ReadRefreshTokenAsync(string refreshToken)
         {
             var tokens = context.RefreshTokens.Include(e => e.User);
-            return await tokens.Where(token => token.Token == refreshToken).FirstOrDefaultAsync();
+            return tokens.Where(token => token.Token == refreshToken).FirstAsync();
         }
 
         public async Task AddRefreshTokenAsync(RefreshToken refreshToken)
         {
-            var oldToken = context.RefreshTokens.Where(token => token.UserId == refreshToken.UserId).FirstOrDefault();
+            var oldToken = await context.RefreshTokens.Where(token => token.UserId == refreshToken.UserId).FirstOrDefaultAsync();
             if (oldToken != null)
             {
                 context.RefreshTokens.Remove(oldToken);
             }
-            await context.RefreshTokens.AddAsync(refreshToken);
-            await context.SaveChangesAsync();
+            context.RefreshTokens.Add(refreshToken);
         }
     }
 }

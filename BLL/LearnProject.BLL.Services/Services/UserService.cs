@@ -2,6 +2,7 @@
 using LearnProject.BLL.Contracts;
 using LearnProject.BLL.Contracts.Models;
 using LearnProject.Domain.Entities;
+using LearnProject.Domain.Models;
 using LearnProject.Domain.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -14,15 +15,15 @@ namespace LearnProject.BLL.Services
     public sealed class UserService : IUserService
     {
         readonly UserManager<User> userManager;
-        readonly IUserRepository userRepository;
+        readonly IRepositoryWrapper repository;
         readonly IMapper mapper;
 
         public UserService(UserManager<User> userManager,
-            IMapper mapper, IUserRepository userRepository)
+            IMapper mapper, IRepositoryWrapper repository)
         {
             this.userManager = userManager;
             this.mapper = mapper;
-            this.userRepository = userRepository;
+            this.repository = repository;
         }
 
         /// <summary>
@@ -31,11 +32,11 @@ namespace LearnProject.BLL.Services
         /// <param name="offset">смещение</param>
         /// <param name="limit">макс. кол-во</param>
         /// <returns>коллекцию моделей пользователей</returns>
-        public async Task<IEnumerable<GetUserModel>> GetUsersAsync(int offset = 0, int limit = 1000)
+        public PagedList<GetUserModel> GetUsers(UserQueryParameters parameters)
         {
-            var users = await userRepository.ReadAllWithRolesAsync(offset, limit);
+            var users = repository.UserRepository.ReadAllWithRoles(parameters);
 
-            var data = mapper.Map<List<GetUserModel>>(users);
+            var data = new PagedList<GetUserModel>(mapper.Map<List<GetUserModel>>(users), users.TotalCount, users.CurrentPage, users.PageSize);
 
             return data;
         }
@@ -47,13 +48,13 @@ namespace LearnProject.BLL.Services
         /// <returns>модель ответа с моделью пользователя</returns>
         public async Task<ServiceResponse<GetUserModel>> GetUserAsync(string id)
         {
-            var user = await userRepository.ReadAsync(id);
+            var user = await repository.UserRepository.FindByKeyAsync(id);
             if (user == null)
             {
                 return ServiceResponse<GetUserModel>.CreateFailedResponse($"User with id {id} not found");
             }
 
-            string userRole = (await userManager.GetRolesAsync(user)).First();
+            string userRole = (await userManager.GetRolesAsync(user!)).First();
 
             GetUserModel value = new GetUserModel()
             {
@@ -100,43 +101,12 @@ namespace LearnProject.BLL.Services
         }
 
         /// <summary>
-        /// существует ли пользователь в бд
-        /// </summary>
-        /// <param name="login">логин</param>
-        /// <param name="password">пароль</param>
-        /// <returns>результат проверки</returns>
-        public async Task<bool> IsUserFound(string login, string password)
-        {
-            var user = await userManager.FindByNameAsync(login);
-            if (user == null)
-            {
-                return false;
-            }
-
-            if (!await userManager.CheckPasswordAsync(user, password))
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        /// <summary>
         /// получить все роли
         /// </summary>
         /// <returns>коллекция ролей</returns>
-        public async Task<IEnumerable<string>> GetRolesAsync()
+        public  Task<List<string>> GetRolesAsync()
         {
-            return await userRepository.ReadAllRolesAsync();
-        }
-
-        /// <summary>
-        /// найти количество пользователей
-        /// </summary>
-        /// <returns>количество пользователей</returns>
-        public async Task<int> GetUsersCountAsync()
-        {
-            return await userRepository.Query(users => users.Skip(1).CountAsync());
+            return repository.UserRepository.ReadAllRoles().ToListAsync();
         }
 
         /// <summary>
@@ -147,7 +117,7 @@ namespace LearnProject.BLL.Services
         /// <returns>модель ответа</returns>
         public async Task<ServiceResponse<int>> UpdateUserAsync(string id, UpdateUserModel model)
         {
-            var user = await userRepository.ReadAsync(id);
+            var user = await repository.UserRepository.FindByKeyAsync(id);
             if (user == null)
                 return ServiceResponse<int>.CreateFailedResponse($"User with id {id} not found");
 
@@ -173,7 +143,7 @@ namespace LearnProject.BLL.Services
         /// <returns>содель результата</returns>
         public async Task<ServiceResponse<int>> ChangeRoleAsync(string id, string newRole)
         {
-            var user = await userRepository.ReadAsync(id);
+            var user = await repository.UserRepository.FindByKeyAsync(id);
 
             if (user == null)
             {

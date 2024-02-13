@@ -17,8 +17,6 @@ namespace Cars.Api.Controllers.Identity
     {
         readonly IIdentityService identityService;
 
-        readonly ILogger<IdentityController> logger;
-
         readonly IMapper mapper;
 
         /// <summary>
@@ -26,11 +24,10 @@ namespace Cars.Api.Controllers.Identity
         /// </summary>
         /// <param name="identityService">сервис аутентификации</param>
         /// <param name="mapper">маппер</param>
-        public IdentityController(IIdentityService identityService, IMapper mapper, ILogger<IdentityController> logger)
+        public IdentityController(IIdentityService identityService, IMapper mapper)
         {
             this.identityService = identityService;
             this.mapper=mapper; 
-            this.logger = logger;
         }
 
         /// <summary>

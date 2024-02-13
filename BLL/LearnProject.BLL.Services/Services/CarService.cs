@@ -4,6 +4,7 @@ using LearnProject.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using LearnProject.BLL.Contracts.Models;
 using LearnProject.BLL.Contracts;
+using LearnProject.Domain.Models;
 
 namespace LearnProject.BLL.Services
 {
@@ -20,18 +21,13 @@ namespace LearnProject.BLL.Services
         /// <summary>
         /// репозиторий для работы с сущностями
         /// </summary>
-        readonly ICarRepository carRepository;
+        readonly IRepositoryWrapper repository;
 
-        /// <summary>
-        /// репозиторий для работы с сущностями моделей авто
-        /// </summary>
-        readonly ICarModelRepository modelRepository;
 
-        public CarService(ICarRepository carRepository, ICarModelRepository modelRepository,
+        public CarService(IRepositoryWrapper repository,
             IMapper mapper)
         {
-            this.carRepository = carRepository;
-            this.modelRepository = modelRepository;
+            this.repository = repository;
             this.mapper = mapper;
         }
 
@@ -41,10 +37,11 @@ namespace LearnProject.BLL.Services
         /// <returns>коллекция авто GetCarModel</returns>
         /// <param name="limit">максимальный размер выборки</param>
         /// <param name="offset">смещение от начала</param>
-        public async Task<IEnumerable<GetCarModel>> GetCarsAsync(int offset = 0, int limit = 1000)
+        public  PagedList<GetCarModel> GetCars(CarQueryParameters parameters)
         {
-            var cars = await carRepository.ReadAllAsync(offset, limit);
-            var data = mapper.Map<List<GetCarModel>>(cars);
+            var cars = repository.CarRepository.GetCars(parameters);
+
+            var data = new PagedList<GetCarModel>(mapper.Map<List<GetCarModel>>(cars), cars.TotalCount, cars.CurrentPage, cars.PageSize);
 
             return data;
         }
@@ -56,7 +53,7 @@ namespace LearnProject.BLL.Services
         /// <returns>модель ответа, содержащая GetCarModel</returns>
         public async Task<ServiceResponse<GetCarModel>> GetCarAsync(int id)
         {
-            var car = await carRepository.ReadAsync(id);
+            var car = await repository.CarRepository.FindByKeyAsync(id);
             if (car == null)
             {
                 return ServiceResponse<GetCarModel>.CreateFailedResponse($"Car with id {id} not found");
@@ -68,18 +65,12 @@ namespace LearnProject.BLL.Services
         }
 
         /// <summary>
-        /// получить число машин в базе
-        /// </summary>
-        /// <returns>число машин</returns>
-        public async Task<int> GetCarsCountAsync() => await carRepository.Query(cars => cars.Skip(1).CountAsync());
-
-        /// <summary>
         /// получить все марки авто
         /// </summary>
         /// <returns>коллекция марок авто</returns>
         public async Task<IEnumerable<GetCarBrandModel>> GetCarBrandModelsAsync()
         {
-            IEnumerable<CarModel> models = await modelRepository.ReadAllAsync();
+            IEnumerable<CarModel> models = await repository.CarModelRepository.ReadAll().ToListAsync();
 
             var data = mapper.Map<List<GetCarBrandModel>>(models);
 
@@ -91,20 +82,22 @@ namespace LearnProject.BLL.Services
         /// </summary>
         /// <param name="carModel">модель для добавления</param>
         /// <returns>модель ответа</returns>
-        public async Task<ServiceResponse<GetCarModel>> AddCarAsync(AddCarModel carModel)
+        public async Task<ServiceResponse<int>> AddCarAsync(AddCarModel carModel)
         {
-            var model = await modelRepository.ReadAsync(carModel.CarModelId);
+            var model = await repository.CarModelRepository.FindByKeyAsync(carModel.CarModelId);
 
             if (model == null)
-                return ServiceResponse<GetCarModel>.CreateFailedResponse($"Car model with id {carModel.CarModelId} not found");
+                return ServiceResponse<int>.CreateFailedResponse($"Car model with id {carModel.CarModelId} not found");
 
             Car car = mapper.Map<Car>(carModel);
 
-            await carRepository.CreateAsync(car);
+            repository.CarRepository.Create(car);
+
+            await repository.SaveAsync();
 
             GetCarModel value = mapper.Map<GetCarModel>(car);
 
-            return ServiceResponse<GetCarModel>.CreateSuccessfulResponse(value);
+            return ServiceResponse<int>.CreateSuccessfulResponse(value.CarId);
         }
 
         /// <summary>
@@ -115,18 +108,18 @@ namespace LearnProject.BLL.Services
         /// <returns>модель ответа</returns>
         public async Task<ServiceResponse<int>> UpdateCarAsync(int id, UpdateCarModel carModel)
         {
-            var car = await carRepository.ReadAsync(id);
+            var car = await repository.CarRepository.FindByKeyAsync(id);
             if (car == null)
                 return ServiceResponse<int>.CreateFailedResponse($"Car with id {id} not found");
 
-            var model = await modelRepository.ReadAsync(carModel.CarModelId);
+            var model = await repository.CarModelRepository.FindByKeyAsync(carModel.CarModelId);
             if (model == null)
                 return ServiceResponse<int>.CreateFailedResponse($"Car model with id {carModel.CarModelId} not found");
 
             carModel.CarId = id;
             mapper.Map(carModel, car);
 
-            await carRepository.UpdateAsync(car);
+            await repository.SaveAsync();
 
             return ServiceResponse<int>.CreateSuccessfulResponse();
         }
@@ -138,11 +131,13 @@ namespace LearnProject.BLL.Services
         /// <returns>модель ответа</returns>
         public async Task<ServiceResponse<int>> DeleteCarAsync(int id)
         {
-            var car = await carRepository.ReadAsync(id);
+            var car = await repository.CarRepository.FindByKeyAsync(id);
             if (car == null)
                 return ServiceResponse<int>.CreateFailedResponse($"Car with id {id} not found");
 
-            await carRepository.DeleteAsync(car);
+            repository.CarRepository.Delete(car);
+
+            await repository.SaveAsync();
 
             return ServiceResponse<int>.CreateSuccessfulResponse();
         }

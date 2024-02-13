@@ -2,9 +2,12 @@
 using Cars.Api.Controllers.Users.Models;
 using LearnProject.BLL.Contracts;
 using LearnProject.BLL.Contracts.Models;
+using LearnProject.Domain.Entities;
+using LearnProject.Domain.Models;
 using LearnProject.Shared.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace Cars.Api.Controllers.Users
 {
@@ -38,10 +41,20 @@ namespace Cars.Api.Controllers.Users
         /// <param name="limit">макс. значение</param>
         [HttpGet("")]
         [ProducesResponseType(typeof(IEnumerable<UserResponse>), 200)]
-        public async Task<IEnumerable<UserResponse>> GetUsers(int offset = 0, int limit = 1000)
+        public IEnumerable<UserResponse> GetUsers([FromQuery] UserQueryParameters parameters)
         {
-            var users = await service.GetUsersAsync(offset, limit);
+            var users = service.GetUsers(parameters);
             var response = mapper.Map<IEnumerable<UserResponse>>(users);
+
+            var metadata = new
+            {
+                users.TotalCount,
+                users.PageSize,
+                users.CurrentPage,
+                users.TotalPages
+            };
+
+            Response.Headers.Append("Pagination", JsonSerializer.Serialize(metadata));
 
             return response;
         }

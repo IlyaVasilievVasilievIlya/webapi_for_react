@@ -1,4 +1,5 @@
 ﻿using LearnProject.BLL.Contracts.Models;
+using LearnProject.Domain.Models;
 
 namespace LearnProject.BLL.Contracts
 {
@@ -13,7 +14,7 @@ namespace LearnProject.BLL.Contracts
         /// <returns>коллекция авто GetCarModel</returns>
         /// <param name="limit">максимальный размер выборки</param>
         /// <param name="offset">смещение от начала</param>
-        Task<IEnumerable<GetCarModel>> GetCarsAsync(int offset = 0, int limit = 1000);
+        PagedList<GetCarModel> GetCars(CarQueryParameters parameters);
 
         /// <summary>
         /// получение по id
@@ -21,12 +22,6 @@ namespace LearnProject.BLL.Contracts
         /// <param name="id">id авто</param>
         /// <returns>модель ответа, содержащая GetCarModel</returns>
         Task<ServiceResponse<GetCarModel>> GetCarAsync(int id);
-
-        /// <summary>
-        /// получить общее число машин
-        /// </summary>
-        /// <returns>число машин</returns>
-        Task<int> GetCarsCountAsync();
 
         /// <summary>
         /// получить все марки авто
@@ -39,7 +34,7 @@ namespace LearnProject.BLL.Contracts
         /// </summary>
         /// <param name="carModel">модель для добавления</param>
         /// <returns>модель ответа</returns>
-        Task<ServiceResponse<GetCarModel>> AddCarAsync(AddCarModel car);
+        Task<ServiceResponse<int>> AddCarAsync(AddCarModel car);
 
         /// <summary>
         /// изменение авто

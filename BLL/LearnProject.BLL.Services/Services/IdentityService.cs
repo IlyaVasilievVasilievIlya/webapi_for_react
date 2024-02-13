@@ -23,18 +23,18 @@ namespace LearnProject.BLL.Services.Services
     /// </summary>
     public class IdentityService : IIdentityService
     {
-        readonly IUserRepository userRepository;
+        readonly IRepositoryWrapper repository;
         readonly IMapper mapper;
         readonly ILogger<IdentityService> logger;
         readonly IOptions<JwtSettings> jwtSettings;
         readonly IConfiguration configuration;
         readonly UserManager<User> userManager;
 
-        public IdentityService(IUserRepository userRepository, IMapper mapper, ILogger<IdentityService> logger,
+        public IdentityService(IRepositoryWrapper repository, IMapper mapper, ILogger<IdentityService> logger,
             IOptions<JwtSettings> jwtSetttings,
             UserManager<User> userManager, IConfiguration configuration)
         {
-            this.userRepository = userRepository;
+            this.repository = repository;
             this.mapper = mapper;
             this.logger = logger;
             this.jwtSettings = jwtSetttings;
@@ -65,7 +65,7 @@ namespace LearnProject.BLL.Services.Services
                 return AuthenticationResponse.CreateFailedResponse(AuthenticationResult.InvalidPasswordWhileLogin, new List<string> { "invalid login or password" });
             }
 
-            var role = (await userRepository.ReadWithRoleAsync(existingUser.Id)).Role;
+            var role = (await repository.UserRepository.ReadWithRoleAsync(existingUser.Id)).Role;
 
             IDictionary<string, object> claims = new Dictionary<string, object>
             {
@@ -100,7 +100,7 @@ namespace LearnProject.BLL.Services.Services
 
             if (existingUser != null) 
             {
-                var role = (await userRepository.ReadWithRoleAsync(existingUser.Id)).Role;
+                var role = (await repository.UserRepository.ReadWithRoleAsync(existingUser.Id)).Role;
 
                 IDictionary<string, object> claims = new Dictionary<string, object>
                 {
@@ -207,7 +207,9 @@ namespace LearnProject.BLL.Services.Services
                 ExpiryDate = DateTime.UtcNow.Add(jwtSettings.Value.RefreshTokenLifetime)
             };
 
-            await userRepository.AddRefreshTokenAsync(refreshToken);
+            await repository.UserRepository.AddRefreshTokenAsync(refreshToken);
+
+            await repository.SaveAsync();
 
             var jwt = tokenHandler.WriteToken(token);
 
@@ -220,7 +222,7 @@ namespace LearnProject.BLL.Services.Services
         /// <param name="model">модель обновления токена</param>
         public async Task<AuthenticationResponse> RefreshTokenAsync(RefreshTokenUserModel model)
         {
-            var storedRefreshToken = await userRepository.ReadRefreshTokenAsync(model.RefreshToken);
+            var storedRefreshToken = await repository.UserRepository.ReadRefreshTokenAsync(model.RefreshToken);
 
             if (storedRefreshToken == null)
             {
@@ -232,7 +234,7 @@ namespace LearnProject.BLL.Services.Services
                 return AuthenticationResponse.CreateFailedResponse(AuthenticationResult.RefreshingTokenFailed, new List<string> { "refresh token expired" });
             }
 
-            var user = await userRepository.ReadWithRoleAsync(storedRefreshToken.UserId);
+            var user = await repository.UserRepository.ReadWithRoleAsync(storedRefreshToken.UserId);
 
             if (user == null)
             {

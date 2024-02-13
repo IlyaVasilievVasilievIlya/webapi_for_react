@@ -2,9 +2,11 @@
 using Cars.Api.Controllers.Cars.Models;
 using LearnProject.BLL.Contracts;
 using LearnProject.BLL.Contracts.Models;
+using LearnProject.Domain.Models;
 using LearnProject.Shared.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace Cars.Api.Controllers.Cars
 {
@@ -31,10 +33,20 @@ namespace Cars.Api.Controllers.Cars
         /// </summary>
         [HttpGet("")]
         [ProducesResponseType(typeof(IEnumerable<CarResponse>), 200)]
-        public async Task<IEnumerable<CarResponse>> GetCars(int offset = 0, int limit = 1000)
+        public IEnumerable<CarResponse> GetCars([FromQuery] CarQueryParameters parameters)
         {
-            var cars = await service.GetCarsAsync(offset, limit);
+            var cars = service.GetCars(parameters);
             var response = mapper.Map<IEnumerable<CarResponse>>(cars);
+
+            var metadata = new
+            {
+                cars.TotalCount,
+                cars.PageSize,
+                cars.CurrentPage,
+                cars.TotalPages
+            };
+
+            Response.Headers.Append("Pagination", JsonSerializer.Serialize(metadata));
 
             return response;
         }
@@ -80,18 +92,18 @@ namespace Cars.Api.Controllers.Cars
         [Authorize(Policy = AppPolicies.EditCars)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<CarResponse>> AddCar(AddCarRequest request)
+        public async Task<ActionResult<int>> AddCar(AddCarRequest request)
         {
             var model = mapper.Map<AddCarModel>(request);
 
-            ServiceResponse<GetCarModel> response = await service.AddCarAsync(model);
+            ServiceResponse<int> response = await service.AddCarAsync(model);
 
             if (!response.IsSuccessful)
             {
                 return BadRequest(response.Error);
             }
 
-            var carResponse = mapper.Map<CarResponse>(response.Value);
+            var carResponse = response.Value;
 
             return carResponse;
         }

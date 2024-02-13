@@ -1,6 +1,8 @@
 ﻿using LearnProject.Domain.Repositories;
 using LearnProject.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using LearnProject.Domain.Models;
+using LearnProject.Shared.Common;
 
 namespace LearnProject.Data.DAL.Repositories
 {
@@ -24,68 +26,32 @@ namespace LearnProject.Data.DAL.Repositories
         /// </summary>
         protected override RepositoryAppDbContext Context 
         { 
-            get => context; 
-            set => context = value; 
+            get => context;
+            set => context = value;
         }
 
-        /// <summary>
-        /// получить список машин
-        /// </summary>
-        /// <param name="offset">смещение</param>
-        /// <param name="limit">макс. количество</param>
-        /// <returns>коллекция сущностей Car</returns>
-        protected override async Task<IEnumerable<Car>> ReadAllImplementationAsync(int offset, int limit)
+        public override Task<Car?> FindByKeyAsync(int key)
         {
-            var cars = context
-                .Cars
-                .Include(e => e.CarModel)
-                .AsNoTracking();
-
-            cars = cars
-                .OrderBy(car => car.CarId)
-                .Skip(Math.Max(offset, 0))
-                .Take(Math.Max(0, limit));
-
-            return await cars.ToListAsync();
+            return FindByCondition(entity => entity.CarId == key).AsTracking().Include(entity => entity.CarModel).FirstOrDefaultAsync();
         }
 
-        /// <summary>
-        /// получить авто по id
-        /// </summary>
-        /// <param name="id">id машины</param>
-        /// <returns>сущность Car (либо null)</returns>
-        protected override async Task<Car?> ReadImplementationAsync(int id) => await context.Cars.FindAsync(id);
-
-        /// <summary>
-        /// пометить авто на добавление
-        /// </summary>
-        /// <param name="car">сущность машины</param>
-        protected override Car CreateImplementation(Car car)
+        public PagedList <Car> GetCars(CarQueryParameters parameters)
         {
-            context.Cars.Add(car);
+            var cars = FindByCondition(car => 
+                (car.Color ?? string.Empty).ToLower().Contains(parameters.Color.ToLower())
+                && (car.CarModel!.Brand + " " + car.CarModel.Name).ToLower().Contains(parameters.CarName.ToLower())
+                && car.CarModel!.Brand.ToLower().Contains(parameters.Brand.ToLower())
+                && car.CarModel!.Name.ToLower().Contains(parameters.Model.ToLower()));
 
-            return car;
+            return PagedList<Car>.ToPagedList(cars
+                .OrderBy(car => car.CarId),
+                parameters.PageNumber,
+                parameters.PageSize);
         }
-        
-        /// <summary>
-        /// пометить авто на изменение
-        /// </summary>
-        /// <param name="car">сущность</param>
-        protected override void UpdateImplementation(Car car) => context.Update(car);
 
-        /// <summary>
-        /// пометить авто на удаление
-        /// </summary>
-        /// <param name="car">сущность</param>
-        protected override void DeleteImplementation(Car car) => context.Cars.Remove(car);
-
-        /// <summary>
-        /// запрос по умолчанию (получение всех сущностей)
-        /// </summary>
-        /// <returns>результат запроса</returns>
-        protected override IQueryable<Car> QueryImplementation()
+        public override IQueryable<Car> ReadAll()
         {
-            return context.Cars.AsNoTracking();
+            return base.ReadAll().Include(car => car.CarModel);
         }
     }
 }

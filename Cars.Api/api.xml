@@ -58,7 +58,7 @@
             контроллер машин
             </summary>
         </member>
-        <member name="M:Cars.Api.Controllers.Cars.CarsController.GetCars(System.Int32,System.Int32)">
+        <member name="M:Cars.Api.Controllers.Cars.CarsController.GetCars(LearnProject.Domain.Models.CarQueryParameters)">
             <summary>
             получение авто
             </summary>
@@ -167,7 +167,7 @@
             контроллер для работы с токенами
             </summary>
         </member>
-        <member name="M:Cars.Api.Controllers.Identity.IdentityController.#ctor(LearnProject.BLL.Contracts.IIdentityService,AutoMapper.IMapper,Microsoft.Extensions.Logging.ILogger{Cars.Api.Controllers.Identity.IdentityController})">
+        <member name="M:Cars.Api.Controllers.Identity.IdentityController.#ctor(LearnProject.BLL.Contracts.IIdentityService,AutoMapper.IMapper)">
             <summary>
             конструктор контроллера
             </summary>
@@ -409,7 +409,7 @@
             <param name="service"></param>
             <param name="mapper"></param>
         </member>
-        <member name="M:Cars.Api.Controllers.Users.UsersController.GetUsers(System.Int32,System.Int32)">
+        <member name="M:Cars.Api.Controllers.Users.UsersController.GetUsers(LearnProject.Domain.Models.UserQueryParameters)">
             <summary>
             получение пользователей
             </summary>
