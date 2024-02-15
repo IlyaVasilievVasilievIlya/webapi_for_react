@@ -21,17 +21,6 @@ namespace Cars.Api.Controllers.Identity.Profiles
         }
 
         /// <summary>
-        /// маппинг (модель запроса на обновление токена -> модель запроса для сервиса)
-        /// </summary>
-        public class TokenRefreshRequestProfile : Profile
-        {
-            public TokenRefreshRequestProfile()
-            {
-                CreateMap<TokenRefreshRequest, RefreshTokenUserModel>();
-            }
-        }
-
-        /// <summary>
         /// модель регистрации приложения -> сервиса
         /// </summary>
         public class RegisterRequestProfile : Profile

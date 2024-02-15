@@ -3,6 +3,7 @@ using Cars.Api.Controllers.Identity.Models;
 using Google.Apis.Auth;
 using LearnProject.BLL.Contracts;
 using LearnProject.BLL.Contracts.Models;
+using LearnProject.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -56,7 +57,7 @@ namespace Cars.Api.Controllers.Identity
             return Ok(new TokenGenerationResponse()
             {
                 AccessToken = authResponse.Token!,
-                RefreshToken = authResponse.RefreshToken!
+                UserInfo = mapper.Map<UserInfoResponse>(authResponse.RefreshToken!.User)
             });
         }
 
@@ -82,10 +83,12 @@ namespace Cars.Api.Controllers.Identity
                 return Unauthorized(authResponse.Errors);
             }
 
+            SetRefreshToken(authResponse.RefreshToken!);
+
             return Ok(new TokenGenerationResponse()
             {
                 AccessToken = authResponse.Token!,
-                RefreshToken = authResponse.RefreshToken!
+                UserInfo = mapper.Map<UserInfoResponse>(authResponse.RefreshToken!.User)
             });
         }
 
@@ -110,10 +113,12 @@ namespace Cars.Api.Controllers.Identity
                 return Unauthorized(authResponse.Errors);
             }
 
+            SetRefreshToken(authResponse.RefreshToken!);
+
             return Ok(new TokenGenerationResponse()
             {
                 AccessToken = authResponse.Token!,
-                RefreshToken = authResponse.RefreshToken!
+                UserInfo = mapper.Map<UserInfoResponse>(authResponse.RefreshToken!.User)
             });
         }
 
@@ -124,20 +129,37 @@ namespace Cars.Api.Controllers.Identity
         [HttpPost("token/refreshing")]
         [ProducesResponseType(typeof(TokenGenerationResponse), 200)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> RefreshToken(TokenRefreshRequest request)
+        public async Task<IActionResult> RefreshToken()
         {
-            var model = mapper.Map<RefreshTokenUserModel>(request);
-            var authResponse = await identityService.RefreshTokenAsync(model);
+            var refreshToken = Request.Cookies["RefreshToken"];
+
+            if (refreshToken == null)
+            {
+                return BadRequest(new List<string> { "Refresh token not found" });
+            }
+
+            var authResponse = await identityService.RefreshTokenAsync(refreshToken);
 
             if (authResponse.Result == AuthenticationResult.RefreshingTokenFailed)
             {
                 return Unauthorized(authResponse.Errors);
             }
 
+            SetRefreshToken(authResponse.RefreshToken!);
+
             return Ok(new TokenGenerationResponse()
             {
                 AccessToken = authResponse.Token!,
-                RefreshToken = authResponse.RefreshToken!
+                UserInfo = mapper.Map<UserInfoResponse>(authResponse.RefreshToken!.User)
+            });
+        }
+
+        void SetRefreshToken(GetRefreshToken token)
+        {
+            HttpContext.Response.Cookies.Append("RefreshToken", token.Token, new CookieOptions
+            {
+                Expires = token.ExpiryDate,
+                HttpOnly = true,
             });
         }
     }

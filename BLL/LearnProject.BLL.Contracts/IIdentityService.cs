@@ -29,8 +29,8 @@ namespace LearnProject.BLL.Contracts
         /// <summary>
         /// обновление refresh токена пользователя
         /// </summary>
-        /// <param name="model">модель обновления</param>
+        /// <param name="token">модель обновления</param>
         /// <returns>результат операции</returns>
-        Task<AuthenticationResponse> RefreshTokenAsync(RefreshTokenUserModel model);
+        Task<AuthenticationResponse> RefreshTokenAsync(string token);
     }
 }

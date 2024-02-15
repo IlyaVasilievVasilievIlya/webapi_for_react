@@ -69,6 +69,8 @@ namespace LearnProject.BLL.Contracts.Models
     {
         public GetUserModelProfile()
         {
+            CreateMap<User, GetUserModel>();
+
             CreateMap<UserWithRoleModel, GetUserModel>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.User.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.User.Name))
@@ -77,6 +79,14 @@ namespace LearnProject.BLL.Contracts.Models
                 .ForMember(dest => dest.Patronymic, opt => opt.MapFrom(src => src.User.Patronymic))
                 .ForMember(dest => dest.BirthDate, opt => opt.MapFrom(src => src.User.BirthDate))
                 .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role));
+        }
+    }
+
+    public class GetRefreshTokenProfile : Profile
+    {
+        public GetRefreshTokenProfile()
+        {
+            CreateMap<RefreshToken, GetRefreshToken>();
         }
     }
 }

@@ -11,8 +11,8 @@
         public required string AccessToken { get; set; }
 
         /// <summary>
-        /// refresh токен
+        /// информация о пользователе
         /// </summary>
-        public required string RefreshToken { get; set; }
+        public required UserInfoResponse UserInfo { get; set; }
     }
 }

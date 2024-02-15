@@ -204,8 +204,12 @@ namespace LearnProject.BLL.Services.Services
                 Token = GenerateRefreshToken(),
                 UserId = user.Id,
                 CreationDate = DateTime.UtcNow,
-                ExpiryDate = DateTime.UtcNow.Add(jwtSettings.Value.RefreshTokenLifetime)
+                ExpiryDate = DateTime.UtcNow.Add(jwtSettings.Value.RefreshTokenLifetime),
+                User = user
             };
+
+            var refreshTokenResponse = mapper.Map<GetRefreshToken>(refreshToken);
+            refreshTokenResponse.User.Role = claims["role"].ToString() ?? AppRoles.User;
 
             await repository.UserRepository.AddRefreshTokenAsync(refreshToken);
 
@@ -213,16 +217,16 @@ namespace LearnProject.BLL.Services.Services
 
             var jwt = tokenHandler.WriteToken(token);
 
-            return AuthenticationResponse.CreateSuccessfulResponse(jwt, refreshToken.Token!);
+            return AuthenticationResponse.CreateSuccessfulResponse(jwt, refreshTokenResponse);
         }
 
         /// <summary>
         /// обновление токена
         /// </summary>
         /// <param name="model">модель обновления токена</param>
-        public async Task<AuthenticationResponse> RefreshTokenAsync(RefreshTokenUserModel model)
+        public async Task<AuthenticationResponse> RefreshTokenAsync(string token)
         {
-            var storedRefreshToken = await repository.UserRepository.ReadRefreshTokenAsync(model.RefreshToken);
+            var storedRefreshToken = await repository.UserRepository.ReadRefreshTokenAsync(token);
 
             if (storedRefreshToken == null)
             {
@@ -258,6 +262,5 @@ namespace LearnProject.BLL.Services.Services
                 return Convert.ToBase64String(randomNumber);
             }
         }
-
     }
 }

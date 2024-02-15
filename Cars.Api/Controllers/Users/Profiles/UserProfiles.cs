@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using Cars.Api.Controllers.Identity.Models;
 using Cars.Api.Controllers.Users.Models;
 using LearnProject.BLL.Contracts.Models;
+using LearnProject.Domain.Entities;
 
 namespace Cars.Api.Controllers.Users.Profiles
 {
@@ -14,6 +16,7 @@ namespace Cars.Api.Controllers.Users.Profiles
             public UserResponseProfile()
             {
                 CreateMap<GetUserModel, UserResponse>();
+                CreateMap<GetUserModel, UserInfoResponse>();
             }
         }
 

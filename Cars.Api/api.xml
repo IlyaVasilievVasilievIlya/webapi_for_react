@@ -192,7 +192,7 @@
             </summary>
             <param name="token">токен отправленный клиентом</param>
         </member>
-        <member name="M:Cars.Api.Controllers.Identity.IdentityController.RefreshToken(Cars.Api.Controllers.Identity.Models.TokenRefreshRequest)">
+        <member name="M:Cars.Api.Controllers.Identity.IdentityController.RefreshToken">
             <summary>
             перевыпуск токена
             </summary>
@@ -276,19 +276,9 @@
             токен доступа
             </summary>
         </member>
-        <member name="P:Cars.Api.Controllers.Identity.Models.TokenGenerationResponse.RefreshToken">
+        <member name="P:Cars.Api.Controllers.Identity.Models.TokenGenerationResponse.UserInfo">
             <summary>
-            refresh токен
-            </summary>
-        </member>
-        <member name="T:Cars.Api.Controllers.Identity.Models.TokenRefreshRequest">
-            <summary>
-            модель для запроса перевыпуска токена
-            </summary>
-        </member>
-        <member name="P:Cars.Api.Controllers.Identity.Models.TokenRefreshRequest.RefreshToken">
-            <summary>
-            refresh токен
+            информация о пользователе
             </summary>
         </member>
         <member name="T:Cars.Api.Controllers.Identity.Profiles.IdentityProfiles">
@@ -299,11 +289,6 @@
         <member name="T:Cars.Api.Controllers.Identity.Profiles.IdentityProfiles.LoginRequestProfile">
             <summary>
             маппинг (модель запроса на логин  -> модель запроса для сервиса)
-            </summary>
-        </member>
-        <member name="T:Cars.Api.Controllers.Identity.Profiles.IdentityProfiles.TokenRefreshRequestProfile">
-            <summary>
-            маппинг (модель запроса на обновление токена -> модель запроса для сервиса)
             </summary>
         </member>
         <member name="T:Cars.Api.Controllers.Identity.Profiles.IdentityProfiles.RegisterRequestProfile">

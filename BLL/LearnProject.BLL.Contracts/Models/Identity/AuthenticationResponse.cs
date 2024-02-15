@@ -1,4 +1,6 @@
-﻿namespace LearnProject.BLL.Contracts.Models
+﻿using LearnProject.Domain.Entities;
+
+namespace LearnProject.BLL.Contracts.Models
 {
     public enum AuthenticationResult
     {
@@ -20,9 +22,9 @@
 
         private AuthenticationResponse(AuthenticationResult result, List<string>? errors) : this(result, errors, null, null) { }
 
-        private AuthenticationResponse(AuthenticationResult result, string? token, string? refreshToken) : this(result, null, token, refreshToken) { }
+        private AuthenticationResponse(AuthenticationResult result, string? token, GetRefreshToken? refreshToken) : this(result, null, token, refreshToken) { }
 
-        private AuthenticationResponse(AuthenticationResult result, List<string>? errors, string? token, string? refreshToken)
+        private AuthenticationResponse(AuthenticationResult result, List<string>? errors, string? token, GetRefreshToken? refreshToken)
         {
             Result = result;
             Errors = errors;
@@ -48,14 +50,14 @@
         /// <summary>
         /// refresh токен
         /// </summary>
-        public string? RefreshToken {  get; private set; }
+        public GetRefreshToken? RefreshToken {  get; private set; }
 
 
         /// <summary>
         /// создать модель с успешным результатом
         /// </summary>
         /// <returns>созданная модель</returns>
-        public static AuthenticationResponse CreateSuccessfulResponse(string token, string refreshToken)
+        public static AuthenticationResponse CreateSuccessfulResponse(string token, GetRefreshToken refreshToken)
         {
             return new AuthenticationResponse(AuthenticationResult.Successed, token, refreshToken);
         }
