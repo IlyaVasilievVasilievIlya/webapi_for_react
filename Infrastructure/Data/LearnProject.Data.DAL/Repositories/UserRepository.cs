@@ -109,5 +109,10 @@ namespace LearnProject.Data.DAL.Repositories
             }
             context.RefreshTokens.Add(refreshToken);
         }
+
+        public void DeleteRefreshTokenAsync(RefreshToken refreshToken)
+        {
+            context.RefreshTokens.Remove(refreshToken);
+        }
     }
 }

@@ -21,6 +21,8 @@ namespace LearnProject.BLL.Contracts
         /// <returns>результат операции</returns>
         Task<AuthenticationResponse> LogInAsync(LoginUserModel model);
 
+        Task<AuthenticationResponse> LogOut(string token); 
+
         /// <summary>
         /// вход через Google
         /// </summary>

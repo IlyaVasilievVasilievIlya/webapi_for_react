@@ -220,6 +220,23 @@ namespace LearnProject.BLL.Services.Services
             return AuthenticationResponse.CreateSuccessfulResponse(jwt, refreshTokenResponse);
         }
 
+        public async Task<AuthenticationResponse> LogOut(string token)
+        {
+            var storedRefreshToken = await repository.UserRepository.ReadRefreshTokenAsync(token);
+
+            if (storedRefreshToken == null)
+            {
+                return AuthenticationResponse.CreateSuccessfulResponse();
+            }
+
+            repository.UserRepository.DeleteRefreshTokenAsync(storedRefreshToken);
+
+            await repository.SaveAsync();
+
+            return AuthenticationResponse.CreateSuccessfulResponse();
+        }
+
+
         /// <summary>
         /// обновление токена
         /// </summary>

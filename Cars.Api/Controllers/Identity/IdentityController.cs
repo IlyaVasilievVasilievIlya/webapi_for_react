@@ -92,6 +92,8 @@ namespace Cars.Api.Controllers.Identity
             });
         }
 
+
+
         /// <summary>
         /// вход через Google
         /// </summary>
@@ -154,12 +156,30 @@ namespace Cars.Api.Controllers.Identity
             });
         }
 
+        [HttpPost("logout")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> LogOut()
+        {
+            var refreshToken = Request.Cookies["RefreshToken"];
+
+            if (refreshToken == null)
+            {
+                return BadRequest(new List<string> { "Refresh token not found" });
+            }
+
+            await identityService.LogOut(refreshToken);
+
+            HttpContext.Response.Cookies.Delete("RefreshToken");
+
+            return NoContent();
+        }
+
         void SetRefreshToken(GetRefreshToken token)
         {
             HttpContext.Response.Cookies.Append("RefreshToken", token.Token, new CookieOptions
             {
                 Expires = token.ExpiryDate,
-                HttpOnly = true,
+                HttpOnly = true
             });
         }
     }

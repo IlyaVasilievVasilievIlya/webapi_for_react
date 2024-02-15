@@ -20,6 +20,7 @@ namespace Cars.Api.Configuration
                     pol.AllowAnyHeader();
                     pol.AllowAnyMethod();
                     pol.WithOrigins(AllowedOrigins.ClientApp)
+                    .AllowCredentials()
                     .WithExposedHeaders("Pagination");
                 });
             });

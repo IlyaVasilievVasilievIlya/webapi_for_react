@@ -10,7 +10,8 @@ namespace LearnProject.BLL.Contracts.Models
         UserDoesNotExist,
         InvalidPasswordWhileLogin,
         RefreshingTokenFailed,
-        TokenValidationFailed
+        TokenValidationFailed,
+        RefreshTokenNotFound
     }
 
     /// <summary>

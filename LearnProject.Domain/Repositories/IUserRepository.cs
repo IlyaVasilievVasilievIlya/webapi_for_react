@@ -41,5 +41,7 @@ namespace LearnProject.Domain.Repositories
         /// </summary>
         /// <param name="refreshToken">токен</param>
         Task AddRefreshTokenAsync(RefreshToken refreshToken);
+
+        void DeleteRefreshTokenAsync(RefreshToken refreshToken);
     }
 }
