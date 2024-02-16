@@ -54,6 +54,8 @@ namespace Cars.Api.Controllers.Identity
                 return BadRequest(authResponse.Errors);
             }
 
+            SetRefreshToken(authResponse.RefreshToken!);
+
             return Ok(new TokenGenerationResponse()
             {
                 AccessToken = authResponse.Token!,
@@ -137,7 +139,7 @@ namespace Cars.Api.Controllers.Identity
 
             if (refreshToken == null)
             {
-                return BadRequest(new List<string> { "Refresh token not found" });
+                return Unauthorized(new List<string> { "Refresh token not found" });
             }
 
             var authResponse = await identityService.RefreshTokenAsync(refreshToken);
@@ -164,7 +166,7 @@ namespace Cars.Api.Controllers.Identity
 
             if (refreshToken == null)
             {
-                return BadRequest(new List<string> { "Refresh token not found" });
+                return NoContent();
             }
 
             await identityService.LogOut(refreshToken);
