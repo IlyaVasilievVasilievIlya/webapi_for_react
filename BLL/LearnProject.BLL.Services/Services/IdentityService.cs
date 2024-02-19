@@ -27,6 +27,7 @@ namespace LearnProject.BLL.Services.Services
         readonly IMapper mapper;
         readonly ILogger<IdentityService> logger;
         readonly IOptions<JwtSettings> jwtSettings;
+        readonly ExternalProviders providers;
         readonly IConfiguration configuration;
         readonly UserManager<User> userManager;
 
@@ -81,7 +82,7 @@ namespace LearnProject.BLL.Services.Services
         {
             var settings = new GoogleJsonWebSignature.ValidationSettings()
             {
-                Audience = new List<string> { configuration["ExternalProviders:Google:ClientId"] ?? ""}
+                Audience = new List<string> { providers.google.ClientId }
             };
 
             GoogleJsonWebSignature.Payload payload;

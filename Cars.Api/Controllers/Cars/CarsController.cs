@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Cars.Api.Controllers.Cars.FIlters;
 using Cars.Api.Controllers.Cars.Models;
 using LearnProject.BLL.Contracts;
 using LearnProject.BLL.Contracts.Models;
@@ -33,9 +34,9 @@ namespace Cars.Api.Controllers.Cars
         /// </summary>
         [HttpGet("")]
         [ProducesResponseType(typeof(IEnumerable<CarResponse>), 200)]
-        public IEnumerable<CarResponse> GetCars([FromQuery] CarQueryParameters parameters)
+        public async Task<IEnumerable<CarResponse>> GetCars([FromQuery] CarQueryParameters parameters)
         {
-            var cars = service.GetCars(parameters);
+            var cars = await service.GetCarsAsync(parameters);
             var response = mapper.Map<IEnumerable<CarResponse>>(cars);
 
             var metadata = new
@@ -92,9 +93,12 @@ namespace Cars.Api.Controllers.Cars
         [Authorize(Policy = AppPolicies.EditCars)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ServiceFilter(typeof(MinioCheckBucketResourceFilter))]
         public async Task<ActionResult<int>> AddCar(AddCarRequest request)
         {
             var model = mapper.Map<AddCarModel>(request);
+
+            model.Image = request.Image.OpenReadStream();
 
             ServiceResponse<int> response = await service.AddCarAsync(model);
 

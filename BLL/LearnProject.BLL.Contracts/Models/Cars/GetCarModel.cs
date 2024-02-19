@@ -26,5 +26,7 @@ namespace LearnProject.BLL.Contracts.Models
         /// цвет
         /// </summary>
         public string? Color { get; set; }
+
+        public byte[]? Image { get; set; }
     }
 }

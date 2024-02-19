@@ -14,7 +14,7 @@ namespace LearnProject.BLL.Contracts
         /// <returns>коллекция авто GetCarModel</returns>
         /// <param name="limit">максимальный размер выборки</param>
         /// <param name="offset">смещение от начала</param>
-        PagedList<GetCarModel> GetCars(CarQueryParameters parameters);
+        Task<PagedList<GetCarModel>> GetCarsAsync(CarQueryParameters parameters);
 
         /// <summary>
         /// получение по id

@@ -26,6 +26,7 @@ namespace Cars.Api.Configuration
 
             services.AddScoped<ICarService, CarService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IImageService, ImageService>();
 
             return services;
         }

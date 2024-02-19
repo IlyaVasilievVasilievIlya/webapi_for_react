@@ -5,6 +5,11 @@ using Microsoft.EntityFrameworkCore;
 using LearnProject.BLL.Contracts.Models;
 using LearnProject.BLL.Contracts;
 using LearnProject.Domain.Models;
+using Minio;
+using Minio.DataModel.Args;
+using Microsoft.AspNetCore.WebUtilities;
+using Cars.Api.Settings;
+using System.Runtime.InteropServices;
 
 namespace LearnProject.BLL.Services
 {
@@ -18,6 +23,10 @@ namespace LearnProject.BLL.Services
         /// </summary>
         readonly IMapper mapper;
 
+        readonly IImageService imageService;
+
+        readonly MinioSettings minioSettings;
+
         /// <summary>
         /// репозиторий для работы с сущностями
         /// </summary>
@@ -25,10 +34,12 @@ namespace LearnProject.BLL.Services
 
 
         public CarService(IRepositoryWrapper repository,
-            IMapper mapper)
+            IMapper mapper, MinioSettings minioSettings, IImageService imageService)
         {
             this.repository = repository;
             this.mapper = mapper;
+            this.minioSettings = minioSettings;
+            this.imageService = imageService;
         }
 
         /// <summary>
@@ -37,11 +48,15 @@ namespace LearnProject.BLL.Services
         /// <returns>коллекция авто GetCarModel</returns>
         /// <param name="limit">максимальный размер выборки</param>
         /// <param name="offset">смещение от начала</param>
-        public  PagedList<GetCarModel> GetCars(CarQueryParameters parameters)
+        public async Task<PagedList<GetCarModel>> GetCarsAsync(CarQueryParameters parameters)
         {
             var cars = repository.CarRepository.GetCars(parameters);
 
-            var data = new PagedList<GetCarModel>(mapper.Map<List<GetCarModel>>(cars), cars.TotalCount, cars.CurrentPage, cars.PageSize);
+            var carModels = mapper.Map<List<GetCarModel>>(cars);
+
+            await Parallel.ForEachAsync(carModels, async (model, token) => model.Image = (await imageService.GetImageAsync($"car_{model.CarId}")).Value?.ToArray());
+
+            var data = new PagedList<GetCarModel>(carModels, cars.TotalCount, cars.CurrentPage, cars.PageSize);
 
             return data;
         }
@@ -60,6 +75,13 @@ namespace LearnProject.BLL.Services
             }
 
             GetCarModel value = mapper.Map<GetCarModel>(car);
+
+            var serviceResponse = await imageService.GetImageAsync($"car_{car.CarId}");
+
+            if (serviceResponse.IsSuccessful)
+            {
+                value.Image = serviceResponse.Value!.ToArray();
+            }
 
             return ServiceResponse<GetCarModel>.CreateSuccessfulResponse(value);
         }
@@ -95,6 +117,8 @@ namespace LearnProject.BLL.Services
 
             await repository.SaveAsync();
 
+            await imageService.UploadImageAsync($"car_{car.CarId}", carModel.Image);
+
             GetCarModel value = mapper.Map<GetCarModel>(car);
 
             return ServiceResponse<int>.CreateSuccessfulResponse(value.CarId);
@@ -119,6 +143,13 @@ namespace LearnProject.BLL.Services
             carModel.CarId = id;
             mapper.Map(carModel, car);
 
+            var response = await imageService.UploadImageAsync($"car_{car.CarId}", carModel.Image);
+
+            if (!response.IsSuccessful)
+            {
+                return ServiceResponse<int>.CreateFailedResponse(response.Error);
+            }
+
             await repository.SaveAsync();
 
             return ServiceResponse<int>.CreateSuccessfulResponse();
@@ -136,6 +167,13 @@ namespace LearnProject.BLL.Services
                 return ServiceResponse<int>.CreateFailedResponse($"Car with id {id} not found");
 
             repository.CarRepository.Delete(car);
+
+            var response = await imageService.DeleteImageAsync($"car_{car.CarId}");
+
+            if (!response.IsSuccessful)
+            {
+                return ServiceResponse<int>.CreateFailedResponse(response.Error);
+            }
 
             await repository.SaveAsync();
 

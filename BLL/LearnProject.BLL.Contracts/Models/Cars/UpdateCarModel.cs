@@ -19,5 +19,7 @@
         /// цвет машины
         /// </summary>
         public string? Color { get; set; }
+
+        public required Stream Image { get; set; }
     }
 }

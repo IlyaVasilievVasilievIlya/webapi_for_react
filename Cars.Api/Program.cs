@@ -1,4 +1,5 @@
 using Cars.Api.Configuration;
+using Cars.Api.Controllers.Cars.FIlters;
 using Cars.Api.Middleware;
 using LearnProject.Data.DAL;
 using LearnProject.Domain.Entities;
@@ -13,8 +14,11 @@ var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 var services = builder.Services;
 
+services.AddHttpContextAccessor();
+
 var logger = new LoggerConfiguration()
     .ReadFrom.Configuration(configuration)
+    .Enrich.WithCorrelationId()
     .CreateLogger();
 builder.Host.UseSerilog(logger, true);
 
@@ -22,6 +26,11 @@ builder.Host.UseSerilog(logger, true);
 services.AddDbContext<RepositoryAppDbContext>(
     options => options.UseNpgsql(configuration.GetConnectionString("Postgres")));
 
+services.AddAppMinio(builder.Configuration);
+
+services.ConfigureExternalProviers(builder.Configuration);
+
+services.AddScoped<MinioCheckBucketResourceFilter>();
 
 services.AddIdentityCore<User>()
     .AddRoles<IdentityRole>()
@@ -38,7 +47,6 @@ services.AddAppAuth(configuration);
 services.AddAuthorization(options =>
 {
     options.AddAppPolicies();
-
 });
 
 services.AddAppSwagger();

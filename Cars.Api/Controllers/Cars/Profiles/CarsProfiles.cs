@@ -23,7 +23,7 @@ namespace Cars.Api.Controllers.Cars.Profiles
     {
         public AddCarRequestProfile()
         {
-            CreateMap<AddCarRequest, AddCarModel>();
+            CreateMap<AddCarRequest, AddCarModel>().ForMember(x => x.Image, opt => opt.Ignore()); 
         }
     }
 
