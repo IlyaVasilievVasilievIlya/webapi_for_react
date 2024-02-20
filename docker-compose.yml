@@ -4,6 +4,9 @@ services:
   carsapi_postgresql:
     image: postgres
 
+  carsapi_minio:
+    image: minio/minio
+
   carsapi_web:
     image: ${DOCKER_REGISTRY-}carsapiweb
     build:
@@ -11,3 +14,4 @@ services:
       dockerfile: Cars.Api/Dockerfile
     depends_on:
       - carsapi_postgresql
+      - carsapi_minio

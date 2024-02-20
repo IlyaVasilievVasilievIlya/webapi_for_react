@@ -13,6 +13,20 @@ services:
     volumes:
       - dbdata:/var/lib/postgresql/data
 
+  carsapi_minio:
+    container_name: minio
+    ports:
+      - "9003:9000"
+      - "9004:9001"
+    environment:
+      MINIO_ROOT_USER: zg2cEegUG0aHRfBqp8xc
+      MINIO_ROOT_PASSWORD: zfZFGKezj6OYM1kjDvw1pMOWhZvEUxkoqNulHAzq
+    command: server --console-address ":9001" /data
+    networks:
+      - shared_carsapi_net
+    volumes:
+      - minio_storage:/data
+
   carsapi_web:
     ports:
       - "10000:8080"
@@ -23,6 +37,7 @@ services:
 
 volumes:
   dbdata:
+  minio_storage:
   
 networks:
   shared_carsapi_net:

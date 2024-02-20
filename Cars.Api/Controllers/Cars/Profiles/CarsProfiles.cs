@@ -12,7 +12,9 @@ namespace Cars.Api.Controllers.Cars.Profiles
         public CarResponseProfile()
         {
             CreateMap<GetCarModel, CarResponse>()
-                .ForMember(dest => dest.Brand, opt => opt.MapFrom(src => src.Model));
+                .ForMember(dest => dest.Brand, opt => opt.MapFrom(src => src.Model))
+                .ForMember(dest => dest.Image, opt => opt
+                    .MapFrom(src => src.Image != null ? ("data:image/jpeg;base64, " + Convert.ToBase64String(src.Image)) : null));
         }
     }
 
@@ -34,7 +36,7 @@ namespace Cars.Api.Controllers.Cars.Profiles
     {
         public UpdateCarRequestProfile()
         {
-            CreateMap<UpdateCarRequest, UpdateCarModel>();
+            CreateMap<UpdateCarRequest, UpdateCarModel>().ForMember(x => x.Image, opt => opt.Ignore());
         }
     }
 

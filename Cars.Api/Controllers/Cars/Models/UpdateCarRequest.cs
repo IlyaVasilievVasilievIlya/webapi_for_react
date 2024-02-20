@@ -18,5 +18,8 @@ namespace Cars.Api.Controllers.Cars.Models
         /// цвет машины
         /// </summary>
         public string? Color { get; set; }
+
+        [Required]
+        public IFormFile Image { get; set; }
     }
 }

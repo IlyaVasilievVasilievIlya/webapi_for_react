@@ -20,6 +20,6 @@
         /// </summary>
         public string? Color { get; set; }
 
-        public byte[]? Image { get; set; }
+        public string? Image { get; set; }
     }
 }

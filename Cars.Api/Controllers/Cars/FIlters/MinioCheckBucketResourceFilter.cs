@@ -9,20 +9,23 @@ namespace Cars.Api.Controllers.Cars.FIlters
     {
         readonly IMinioClient minioClient;
         readonly MinioSettings minioSettings;
+        readonly ILogger<MinioCheckBucketResourceFilter> logger;
 
-        public MinioCheckBucketResourceFilter(IMinioClient minioClient, MinioSettings minioSettings)
+        public MinioCheckBucketResourceFilter(IMinioClient minioClient, MinioSettings minioSettings, ILogger<MinioCheckBucketResourceFilter> logger)
         {
             this.minioClient = minioClient;
             this.minioSettings = minioSettings;
+            this.logger = logger;
         }
 
         public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
         {
-
-            //var client = new MinioClient().WithEndpoint(minioSettings.Endpoint)
-            //    .WithCredentials(minioSettings.AccessKey, minioSettings.SecretKey)
-            //    .Build();
-
+            var res = await minioClient.ListBucketsAsync();
+            if (res == null)
+                logger.LogInformation("res null");
+            if (res?.Buckets == null)
+                logger.LogInformation("buckets null");
+            logger.LogInformation(res?.Buckets[0].Name);
             var beArgs = new BucketExistsArgs().WithBucket(minioSettings.Bucket);
             bool found = await minioClient.BucketExistsAsync(beArgs);
             if (!found)
