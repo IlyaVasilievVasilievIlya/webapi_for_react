@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
@@ -270,6 +271,26 @@ namespace LearnProject.BLL.Services.Services
 
             return await CreateAuthenticationResultAsync(user.User, claims);
         }
+        public async Task<AuthenticationResponse> CheckRefreshTokenExists(string refreshToken)
+        {
+            var storedRefreshToken = await repository.UserRepository.ReadRefreshTokenAsync(refreshToken);
+
+            if (storedRefreshToken == null)
+            {
+                return AuthenticationResponse.CreateFailedResponse(AuthenticationResult.RefreshTokenNotFound, new List<string> { "refresh token not found" });
+            }
+
+            if (DateTime.UtcNow > storedRefreshToken.ExpiryDate)
+            {
+                return AuthenticationResponse.CreateFailedResponse(AuthenticationResult.RefreshingTokenFailed, new List<string> { "refresh token expired" });
+            }
+
+            var user = await repository.UserRepository.ReadWithRoleAsync(storedRefreshToken.UserId);
+            var refreshTokenResponse = mapper.Map<GetRefreshToken>(storedRefreshToken);
+            refreshTokenResponse.User.Role = user.Role;
+
+            return AuthenticationResponse.CreateSuccessfulResponse(string.Empty, refreshTokenResponse);
+        }
 
         string GenerateRefreshToken()
         {
@@ -280,5 +301,6 @@ namespace LearnProject.BLL.Services.Services
                 return Convert.ToBase64String(randomNumber);
             }
         }
+
     }
 }

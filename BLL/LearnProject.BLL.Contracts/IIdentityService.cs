@@ -34,5 +34,7 @@ namespace LearnProject.BLL.Contracts
         /// <param name="token">модель обновления</param>
         /// <returns>результат операции</returns>
         Task<AuthenticationResponse> RefreshTokenAsync(string token);
+
+        Task<AuthenticationResponse> CheckRefreshTokenExists(string refreshToken);
     }
 }

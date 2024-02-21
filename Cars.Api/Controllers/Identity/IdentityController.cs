@@ -158,6 +158,26 @@ namespace Cars.Api.Controllers.Identity
             });
         }
 
+        [HttpGet("checkingAuth")]
+        public async Task<IActionResult> CheckAuthenticated()
+        {
+            var refreshToken = Request.Cookies["RefreshToken"];
+
+            if (refreshToken == null)
+            {
+                return Unauthorized(new List<string> { "Refresh token not found" });
+            }
+
+            var authResponse = await identityService.CheckRefreshTokenExists(refreshToken);
+
+            if (authResponse.Result == AuthenticationResult.RefreshTokenNotFound)
+            {
+                return Unauthorized(authResponse.Errors);
+            }
+
+            return Ok(authResponse.RefreshToken!.User);
+        }
+
         [HttpPost("logout")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> LogOut()
