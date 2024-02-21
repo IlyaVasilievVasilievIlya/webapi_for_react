@@ -19,7 +19,6 @@ namespace Cars.Api.Controllers.Cars.Models
         /// </summary>
         public string? Color { get; set; }
 
-        [Required]
-        public IFormFile Image { get; set; }
+        public IFormFile? Image { get; set; }
     }
 }

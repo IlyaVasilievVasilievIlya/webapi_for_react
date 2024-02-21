@@ -17,7 +17,6 @@ namespace Cars.Api.Controllers.Cars.FIlters
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            bool validationResult = true;
             context.ActionArguments.TryGetValue("request", out object? model);
             if (model == null) 
             {

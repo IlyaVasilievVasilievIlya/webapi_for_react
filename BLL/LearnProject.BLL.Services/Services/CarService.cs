@@ -144,11 +144,14 @@ namespace LearnProject.BLL.Services
             carModel.CarId = id;
             mapper.Map(carModel, car);
 
-            var response = await imageService.UploadImageAsync($"car_{car.CarId}", carModel.Image);
-
-            if (!response.IsSuccessful)
+            if (carModel.Image != null)
             {
-                return ServiceResponse<int>.CreateFailedResponse(response.Error);
+                var response = await imageService.UploadImageAsync($"car_{car.CarId}", carModel.Image);
+
+                if (!response.IsSuccessful)
+                {
+                    return ServiceResponse<int>.CreateFailedResponse(response.Error);
+                }
             }
 
             await repository.SaveAsync();

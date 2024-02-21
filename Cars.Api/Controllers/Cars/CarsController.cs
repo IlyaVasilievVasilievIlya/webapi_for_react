@@ -126,7 +126,7 @@ namespace Cars.Api.Controllers.Cars
         {
             var model = mapper.Map<UpdateCarModel>(request);
 
-            model.Image = request.Image.OpenReadStream();
+            model.Image = request.Image?.OpenReadStream();
 
             ServiceResponse<int> response = await service.UpdateCarAsync(id, model);
 

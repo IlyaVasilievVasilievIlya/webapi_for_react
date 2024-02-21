@@ -20,6 +20,6 @@
         /// </summary>
         public string? Color { get; set; }
 
-        public required Stream Image { get; set; }
+        public Stream? Image { get; set; }
     }
 }
