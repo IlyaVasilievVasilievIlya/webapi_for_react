@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using System.Runtime.ConstrainedExecution;
+using System.Runtime.InteropServices;
 
 namespace LearnProject.BLL.Services.Services
 {
@@ -29,6 +30,8 @@ namespace LearnProject.BLL.Services.Services
         {
             try
             {
+                await CheckObjectExists(id);
+
                 await minioClient.RemoveObjectAsync(new RemoveObjectArgs().WithBucket(settings.Bucket).WithObject(id));
                 return ServiceResponse<int>.CreateSuccessfulResponse();
             }
@@ -42,6 +45,8 @@ namespace LearnProject.BLL.Services.Services
         {
             try
             {
+                await CheckObjectExists(id);
+
                 MemoryStream stream = new MemoryStream();
                 var streamd = await minioClient.GetObjectAsync(new GetObjectArgs().WithBucket(settings.Bucket).WithObject(id).
                     WithCallbackStream(str => str.CopyTo(stream)));
@@ -61,12 +66,22 @@ namespace LearnProject.BLL.Services.Services
                 .WithStreamData(stream)
                 .WithBucket(settings.Bucket)
                 .WithObject(id).WithObjectSize(stream.Length));
+
+                await CheckObjectExists(id);
+
                 return ServiceResponse<int>.CreateSuccessfulResponse();
             }
             catch (Exception ex)
             {
                 return ServiceResponse<int>.CreateFailedResponse(ex.Message);
             }
+        }
+
+        async Task CheckObjectExists(string id)
+        {
+            StatObjectArgs args = new StatObjectArgs()
+                .WithBucket(settings.Bucket).WithObject(id);
+            await minioClient.StatObjectAsync(args);
         }
     }
 }

@@ -27,10 +27,11 @@ services.AddDbContext<RepositoryAppDbContext>(
     options => options.UseNpgsql(configuration.GetConnectionString("Postgres")));
 
 services.AddAppMinio(builder.Configuration);
+services.AddFileUploadSettings(builder.Configuration);
 
 services.ConfigureExternalProviers(builder.Configuration);
 
-services.AddScoped<MinioCheckBucketResourceFilter>();
+services.AddScoped<FileValidationActionFilter>();
 
 services.AddIdentityCore<User>()
     .AddRoles<IdentityRole>()
@@ -60,10 +61,11 @@ services.AddAppServices();
 services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 
-
 var app = builder.Build();
 
 app.ApplyMigrations();
+
+app.EnsureMinioBucketExists();
 
 app.UseAppCors();
 

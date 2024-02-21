@@ -54,7 +54,8 @@ namespace LearnProject.BLL.Services
 
             var carModels = mapper.Map<List<GetCarModel>>(cars);
 
-            await Parallel.ForEachAsync(carModels, async (model, token) => model.Image = (await imageService.GetImageAsync($"car_{model.CarId}")).Value?.ToArray());
+            await Parallel.ForEachAsync(carModels, async (model, token) => 
+                model.Image = (await imageService.GetImageAsync($"car_{model.CarId}")).Value?.ToArray());
 
             var data = new PagedList<GetCarModel>(carModels, cars.TotalCount, cars.CurrentPage, cars.PageSize);
 

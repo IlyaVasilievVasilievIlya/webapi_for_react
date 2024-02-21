@@ -17,7 +17,6 @@ namespace Cars.Api.Controllers.Cars
     [ApiController]
     [Authorize(Policy = AppPolicies.ViewCars)]
     [Route("api/[controller]")]
-    [ServiceFilter(typeof(MinioCheckBucketResourceFilter))]
     public class CarsController : ControllerBase
     {
 
@@ -94,6 +93,7 @@ namespace Cars.Api.Controllers.Cars
         [Authorize(Policy = AppPolicies.EditCars)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ServiceFilter(typeof(FileValidationActionFilter))]
         public async Task<ActionResult<int>> AddCar(AddCarRequest request)
         {
             var model = mapper.Map<AddCarModel>(request);
@@ -121,6 +121,7 @@ namespace Cars.Api.Controllers.Cars
         [Authorize(Policy = AppPolicies.EditCars)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ServiceFilter(typeof(FileValidationActionFilter))]
         public async Task<IActionResult> UpdateCar(int id, UpdateCarRequest request)
         {
             var model = mapper.Map<UpdateCarModel>(request);
