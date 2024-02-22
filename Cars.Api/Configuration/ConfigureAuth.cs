@@ -1,5 +1,5 @@
 ﻿using Google.Apis.Auth;
-using LearnProject.Shared.Common;
+using LearnProject.Shared.Common.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
@@ -18,10 +18,7 @@ namespace Cars.Api.Configuration
         /// <returns>коллекция сервисов</returns>
         internal static IServiceCollection AddAppAuth(this IServiceCollection services, ConfigurationManager configuration)
         {
-            var settings = new JwtSettings();
-            var section = configuration.GetSection(nameof(JwtSettings));
-            services.Configure<JwtSettings>(section);
-            section.Bind(settings);
+            var settings = services.AddAppSettings<JwtSettings>(configuration);
 
             var tokenValidationParameters = new TokenValidationParameters
             {

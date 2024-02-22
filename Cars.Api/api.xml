@@ -29,6 +29,11 @@
             </summary>
             <param name="app">Application</param>
         </member>
+        <member name="T:Cars.Api.Configuration.ConfigureMinio">
+            <summary>
+            конфигурация minio
+            </summary>
+        </member>
         <member name="M:Cars.Api.Configuration.ConfigurePolicies.AddAppPolicies(Microsoft.AspNetCore.Authorization.AuthorizationOptions)">
             <summary>
             метод расширения для добавления политик
@@ -52,6 +57,11 @@
             </summary>
             <param name="services">коллекция DI</param>
             <returns>коллекция DI</returns>
+        </member>
+        <member name="T:Cars.Api.Configuration.SettingsConfigurator">
+            <summary>
+            класс добавления строго типизированных настроек
+            </summary>
         </member>
         <member name="T:Cars.Api.Controllers.Cars.CarsController">
             <summary>
@@ -91,6 +101,11 @@
             попытка удаления
             </summary>
             <param name="id">id машины</param>
+        </member>
+        <member name="T:Cars.Api.Controllers.Cars.FIlters.FileValidationActionFilter">
+            <summary>
+            фильтр проверки полученного файла
+            </summary>
         </member>
         <member name="T:Cars.Api.Controllers.Cars.Models.AddCarRequest">
             <summary>
@@ -196,7 +211,17 @@
             <summary>
             перевыпуск токена
             </summary>
-            <param name="request">модель запроса для перевыпуска токенов</param>
+        </member>
+        <member name="M:Cars.Api.Controllers.Identity.IdentityController.CheckAuthenticated">
+            <summary>
+            проверка аутентификации пользователя
+            </summary>
+            <returns>информация о пользователе</returns>
+        </member>
+        <member name="M:Cars.Api.Controllers.Identity.IdentityController.LogOut">
+            <summary>
+            выход из приложения
+            </summary>
         </member>
         <member name="T:Cars.Api.Controllers.Identity.Models.LoginRequest">
             <summary>
@@ -279,6 +304,11 @@
         <member name="P:Cars.Api.Controllers.Identity.Models.TokenGenerationResponse.UserInfo">
             <summary>
             информация о пользователе
+            </summary>
+        </member>
+        <member name="T:Cars.Api.Controllers.Identity.Models.UserInfoResponse">
+            <summary>
+            информация о пользователе после успешного входа / регистрации
             </summary>
         </member>
         <member name="T:Cars.Api.Controllers.Identity.Profiles.IdentityProfiles">
@@ -398,8 +428,7 @@
             <summary>
             получение пользователей
             </summary>
-            <param name="offset">смещение</param>
-            <param name="limit">макс. значение</param>
+            <param name="parameters">параметры запроса</param>
         </member>
         <member name="M:Cars.Api.Controllers.Users.UsersController.UpdateUser(System.String,Cars.Api.Controllers.Users.Models.UpdateUserRequest)">
             <summary>

@@ -1,22 +1,22 @@
-﻿using Cars.Api.Settings;
-using LearnProject.Data.DAL;
+﻿using LearnProject.Data.DAL;
 using LearnProject.Data.MigrationService;
 using LearnProject.Shared.Common;
+using LearnProject.Shared.Common.Settings;
 using Minio;
 using Minio.AspNetCore;
 using Minio.DataModel.Args;
 
 namespace Cars.Api.Configuration
 {
+    /// <summary>
+    /// конфигурация minio
+    /// </summary>
     public static class ConfigureMinio
     {
         public static IServiceCollection AddAppMinio(this IServiceCollection services, IConfiguration config)
         {
 
-            var settings = new MinioSettings();
-            var section = config.GetSection(nameof(MinioSettings));
-            section.Bind(settings);
-            services.AddSingleton(settings);
+            var settings = services.AddAppSettings<MinioSettings>(config);
 
             if (settings.SecretKey != null && settings.AccessKey != null)
             {

@@ -129,7 +129,6 @@ namespace Cars.Api.Controllers.Identity
         /// <summary>
         /// перевыпуск токена
         /// </summary>
-        /// <param name="request">модель запроса для перевыпуска токенов</param>
         [HttpPost("token/refreshing")]
         [ProducesResponseType(typeof(TokenGenerationResponse), 200)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -158,6 +157,10 @@ namespace Cars.Api.Controllers.Identity
             });
         }
 
+        /// <summary>
+        /// проверка аутентификации пользователя
+        /// </summary>
+        /// <returns>информация о пользователе</returns>
         [HttpGet("checkingAuth")]
         public async Task<IActionResult> CheckAuthenticated()
         {
@@ -178,6 +181,9 @@ namespace Cars.Api.Controllers.Identity
             return Ok(authResponse.RefreshToken!.User);
         }
 
+        /// <summary>
+        /// выход из приложения
+        /// </summary>
         [HttpPost("logout")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> LogOut()

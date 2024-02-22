@@ -9,10 +9,26 @@ namespace LearnProject.BLL.Contracts
 {
     public interface IImageService
     {
-        Task<ServiceResponse<int>> UploadImageAsync(string id, Stream stream);
-
+        /// <summary>
+        /// получить изображение
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         Task<ServiceResponse<MemoryStream>> GetImageAsync(string id);
 
+        /// <summary>
+        /// загрузить / обновить картинку
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        Task<ServiceResponse<int>> UploadImageAsync(string id, Stream stream);
+
+        /// <summary>
+        /// удалить картинку
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         Task<ServiceResponse<int>> DeleteImageAsync(string id);
     }
 }

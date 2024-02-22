@@ -25,6 +25,6 @@ namespace LearnProject.BLL.Contracts.Models
         /// <summary>
         /// навигационное свойство
         /// </summary>
-        public GetUserModel User { get; set; }
+        public GetUserModel User { get; set; } = null!;
     }
 }

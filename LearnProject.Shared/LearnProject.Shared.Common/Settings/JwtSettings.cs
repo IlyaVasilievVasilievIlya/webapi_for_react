@@ -1,4 +1,4 @@
-﻿namespace LearnProject.Shared.Common
+﻿namespace LearnProject.Shared.Common.Settings
 {
     /// <summary>
     /// настройки jwt для доступа к api

@@ -54,20 +54,14 @@ namespace LearnProject.BLL.Services
                 return ServiceResponse<GetUserModel>.CreateFailedResponse($"User with id {id} not found");
             }
 
-            string userRole = (await userManager.GetRolesAsync(user!)).First();
+            string userRole = (await userManager.GetRolesAsync(user)).First();
 
-            GetUserModel value = new GetUserModel()
-            {
-                Id = user.Id,
-                Email = user.Email,
-                Name = user.Name,
-                Surname = user.Surname,
-                Patronymic = user.Patronymic,
-                BirthDate = user.BirthDate,
-                Role = userRole
-            };
+            GetUserModel userModel = mapper.Map<GetUserModel>(user);
 
-            return ServiceResponse<GetUserModel>.CreateSuccessfulResponse(value);
+            userModel.Role = userRole;
+
+
+            return ServiceResponse<GetUserModel>.CreateSuccessfulResponse(userModel);
         }
 
         /// <summary>
@@ -86,18 +80,11 @@ namespace LearnProject.BLL.Services
 
             string userRole = (await userManager.GetRolesAsync(user)).First();
 
-            GetUserModel value = new GetUserModel()
-            {
-                Id = user.Id,
-                Email = user.Email,
-                Name = user.Name,
-                Surname = user.Surname,
-                Patronymic = user.Patronymic,
-                BirthDate = user.BirthDate,
-                Role = userRole
-            };
+            GetUserModel userModel = mapper.Map<GetUserModel>(user);
 
-            return ServiceResponse<GetUserModel>.CreateSuccessfulResponse(value);
+            userModel.Role = userRole;
+
+            return ServiceResponse<GetUserModel>.CreateSuccessfulResponse(userModel);
         }
 
         /// <summary>

@@ -20,6 +20,6 @@ namespace Cars.Api.Controllers.Cars.Models
         public string? Color { get; set; }
 
         [Required]
-        public IFormFile Image { get; set; }
+        public required IFormFile Image { get; set; }
     }
 }

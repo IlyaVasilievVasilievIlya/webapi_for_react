@@ -29,6 +29,8 @@ namespace LearnProject.Domain.Repositories
         /// <returns>модель ответа</returns>
         Task<UserWithRoleModel> ReadWithRoleAsync(string id);
 
+        string GetUserRole(string id);
+
         /// <summary>
         /// получить refresh токен
         /// </summary>
@@ -42,6 +44,10 @@ namespace LearnProject.Domain.Repositories
         /// <param name="refreshToken">токен</param>
         Task AddRefreshTokenAsync(RefreshToken refreshToken);
 
+        /// <summary>
+        /// удаление refresh token
+        /// </summary>
+        /// <param name="refreshToken"></param>
         void DeleteRefreshTokenAsync(RefreshToken refreshToken);
     }
 }

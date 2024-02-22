@@ -4,6 +4,7 @@ using Cars.Api.Middleware;
 using LearnProject.Data.DAL;
 using LearnProject.Domain.Entities;
 using LearnProject.Shared.Common;
+using LearnProject.Shared.Common.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -27,9 +28,9 @@ services.AddDbContext<RepositoryAppDbContext>(
     options => options.UseNpgsql(configuration.GetConnectionString("Postgres")));
 
 services.AddAppMinio(builder.Configuration);
-services.AddFileUploadSettings(builder.Configuration);
 
-services.ConfigureExternalProviers(builder.Configuration);
+services.AddAppSettings<FileUploadSettings>(builder.Configuration);
+services.AddAppSettings<ExternalProviders>(builder.Configuration);
 
 services.AddScoped<FileValidationActionFilter>();
 

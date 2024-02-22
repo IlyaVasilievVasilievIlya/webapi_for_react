@@ -5,6 +5,7 @@ using LearnProject.BLL.Contracts.Models;
 using LearnProject.Domain.Entities;
 using LearnProject.Domain.Repositories;
 using LearnProject.Shared.Common;
+using LearnProject.Shared.Common.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -27,21 +28,19 @@ namespace LearnProject.BLL.Services.Services
         readonly IRepositoryWrapper repository;
         readonly IMapper mapper;
         readonly ILogger<IdentityService> logger;
-        readonly IOptions<JwtSettings> jwtSettings;
+        readonly JwtSettings jwtSettings;
         readonly ExternalProviders providers;
-        readonly IConfiguration configuration;
         readonly UserManager<User> userManager;
 
         public IdentityService(IRepositoryWrapper repository, IMapper mapper, ILogger<IdentityService> logger,
-            IOptions<JwtSettings> jwtSetttings,
-            UserManager<User> userManager, IConfiguration configuration)
+            JwtSettings jwtSettings, ExternalProviders providers, UserManager<User> userManager)
         {
             this.repository = repository;
             this.mapper = mapper;
             this.logger = logger;
-            this.jwtSettings = jwtSetttings;
+            this.jwtSettings = jwtSettings;
+            this.providers = providers;
             this.userManager = userManager;
-            this.configuration = configuration;
         }
 
         /// <summary>
@@ -67,16 +66,7 @@ namespace LearnProject.BLL.Services.Services
                 return AuthenticationResponse.CreateFailedResponse(AuthenticationResult.InvalidPasswordWhileLogin, new List<string> { "invalid login or password" });
             }
 
-            var role = (await repository.UserRepository.ReadWithRoleAsync(existingUser.Id)).Role;
-
-            IDictionary<string, object> claims = new Dictionary<string, object>
-            {
-                { "role", role }
-            };
-
-            logger.LogInformation("the user {Email} is logged into the application.", existingUser.Email);
-
-            return await CreateAuthenticationResultAsync(existingUser, claims);
+            return await CreateAuthenticationResultForExistingUser(existingUser);
         }
 
         public async Task<AuthenticationResponse> LogInWithGoogleAsync(string token)
@@ -93,7 +83,7 @@ namespace LearnProject.BLL.Services.Services
             }
             catch (InvalidJwtException e)
             {
-                logger.Log(LogLevel.Information, e.Message);
+                logger.LogInformation(e.Message);
                 return AuthenticationResponse.CreateFailedResponse(AuthenticationResult.TokenValidationFailed,
                     new List<string> { "Google authentication failed - invalidToken" });
             }
@@ -102,16 +92,7 @@ namespace LearnProject.BLL.Services.Services
 
             if (existingUser != null) 
             {
-                var role = (await repository.UserRepository.ReadWithRoleAsync(existingUser.Id)).Role;
-
-                IDictionary<string, object> claims = new Dictionary<string, object>
-                {
-                    { "role", role }
-                };
-
-                logger.Log(LogLevel.Information, "Google authentication succeded");
-
-                return await CreateAuthenticationResultAsync(existingUser, claims);
+                return await CreateAuthenticationResultForExistingUser(existingUser);
             }
 
             User newUser = new User()
@@ -121,24 +102,7 @@ namespace LearnProject.BLL.Services.Services
                 Email = payload.Email
             };
 
-            var result = await userManager.CreateAsync(newUser);
-
-            if (!result.Succeeded)
-            {
-                logger.LogInformation("Cannot register user {Email}.", payload.Email);
-                return AuthenticationResponse.CreateFailedResponse(AuthenticationResult.RegistrationFailed, result.Errors.Select(error => error.Description).ToList());
-            }
-
-            await userManager.AddToRoleAsync(newUser, AppRoles.User);
-
-            IDictionary<string, object> newUserClaims = new Dictionary<string, object>
-            {
-                { "role", AppRoles.User }
-            };
-
-            logger.Log(LogLevel.Information, "Google authentication succeded");
-
-            return await CreateAuthenticationResultAsync(newUser, newUserClaims);
+            return await CreateAuthenticationResultForNewUser(newUser);
         }
 
         /// <summary>
@@ -158,68 +122,7 @@ namespace LearnProject.BLL.Services.Services
 
             User user = mapper.Map<User>(model);
 
-            var result = await userManager.CreateAsync(user, model.Password);
-
-            if (!result.Succeeded)
-            {
-                logger.LogInformation("Cannot register user {Email}.", model.Email);
-                return AuthenticationResponse.CreateFailedResponse(AuthenticationResult.RegistrationFailed, result.Errors.Select(error => error.Description).ToList());
-            }
-
-            await userManager.AddToRoleAsync(user, AppRoles.User);
-
-            IDictionary<string, object> claims = new Dictionary<string, object>
-            {
-                { "role", AppRoles.User }
-            };
-
-            logger.LogInformation("User {Email} created a new account with password.", user.Email);
-
-            return await CreateAuthenticationResultAsync(user, claims);
-        }
-
-        /// <summary>
-        /// генерация токена
-        /// </summary>
-        /// <param name="user">сущность пользователя</param>
-        /// <param name="claims">клеймы пользоватляеля</param>
-        /// <returns></returns>
-        async Task<AuthenticationResponse> CreateAuthenticationResultAsync(User user, IDictionary<string, object> claims)
-        {
-            var settings = jwtSettings.Value;
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(settings.Key);
-
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Expires = DateTime.UtcNow.Add(jwtSettings.Value.TokenLifetime),
-                Issuer = settings.Issuer,
-                Claims =  claims,
-                Audience = settings.Audience,
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
-            };
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-
-            var refreshToken = new RefreshToken()
-            {
-                Token = GenerateRefreshToken(),
-                UserId = user.Id,
-                CreationDate = DateTime.UtcNow,
-                ExpiryDate = DateTime.UtcNow.Add(jwtSettings.Value.RefreshTokenLifetime),
-                User = user
-            };
-
-            var refreshTokenResponse = mapper.Map<GetRefreshToken>(refreshToken);
-            refreshTokenResponse.User.Role = claims["role"].ToString() ?? AppRoles.User;
-
-            await repository.UserRepository.AddRefreshTokenAsync(refreshToken);
-
-            await repository.SaveAsync();
-
-            var jwt = tokenHandler.WriteToken(token);
-
-            return AuthenticationResponse.CreateSuccessfulResponse(jwt, refreshTokenResponse);
+            return await CreateAuthenticationResultForNewUser(user, model.Password);
         }
 
         public async Task<AuthenticationResponse> LogOut(string token)
@@ -235,9 +138,10 @@ namespace LearnProject.BLL.Services.Services
 
             await repository.SaveAsync();
 
+            logger.LogInformation("User {Email} logged out.", storedRefreshToken.User.Email);
+
             return AuthenticationResponse.CreateSuccessfulResponse();
         }
-
 
         /// <summary>
         /// обновление токена
@@ -271,6 +175,7 @@ namespace LearnProject.BLL.Services.Services
 
             return await CreateAuthenticationResultAsync(user.User, claims);
         }
+
         public async Task<AuthenticationResponse> CheckRefreshTokenExists(string refreshToken)
         {
             var storedRefreshToken = await repository.UserRepository.ReadRefreshTokenAsync(refreshToken);
@@ -292,6 +197,97 @@ namespace LearnProject.BLL.Services.Services
             return AuthenticationResponse.CreateSuccessfulResponse(string.Empty, refreshTokenResponse);
         }
 
+        private async Task<AuthenticationResponse> CreateAuthenticationResultForNewUser(User newUser, string? password = null)
+        {
+            var result = password == null ? await userManager.CreateAsync(newUser) : await userManager.CreateAsync(newUser, password);
+
+            if (!result.Succeeded)
+            {
+                logger.LogInformation("Cannot register user {Email}.", newUser.Email);
+                return AuthenticationResponse.CreateFailedResponse(AuthenticationResult.RegistrationFailed, result.Errors.Select(error => error.Description).ToList());
+            }
+
+            await userManager.AddToRoleAsync(newUser, AppRoles.User);
+
+            IDictionary<string, object> newUserClaims = new Dictionary<string, object>
+            {
+                { "role", AppRoles.User }
+            };
+
+            logger.LogInformation("User {Email} created.", newUser.Email);
+
+            return await CreateAuthenticationResultAsync(newUser, newUserClaims);
+        }
+
+        Task<AuthenticationResponse> CreateAuthenticationResultForExistingUser(User user)
+        {
+            var role = repository.UserRepository.GetUserRole(user.Id);
+
+            IDictionary<string, object> claims = new Dictionary<string, object>
+            {
+                { "role", role }
+            };
+
+            logger.LogInformation("User {Email} logged in", user.Email);
+
+            return CreateAuthenticationResultAsync(user, claims);
+        }
+
+        /// <summary>
+        /// генерация токена
+        /// </summary>
+        /// <param name="user">сущность пользователя</param>
+        /// <param name="claims">клеймы пользоватляеля</param>
+        /// <returns></returns>
+        async Task<AuthenticationResponse> CreateAuthenticationResultAsync(User user, IDictionary<string, object> claims)
+        {
+            var jwt = GenerateToken(claims);
+
+            var refreshTokenResponse = await CreateRefreshToken(user, claims);
+
+            return AuthenticationResponse.CreateSuccessfulResponse(jwt, refreshTokenResponse);
+        }
+
+        string GenerateToken(IDictionary<string, object> claims)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(jwtSettings.Key);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Expires = DateTime.UtcNow.Add(jwtSettings.TokenLifetime),
+                Issuer = jwtSettings.Issuer,
+                Claims = claims,
+                Audience = jwtSettings.Audience,
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var jwt = tokenHandler.WriteToken(token);
+            return jwt;
+        }
+
+        async Task<GetRefreshToken> CreateRefreshToken(User user, IDictionary<string, object> claims)
+        {
+            var refreshToken = new RefreshToken()
+            {
+                Token = GenerateRefreshToken(),
+                UserId = user.Id,
+                CreationDate = DateTime.UtcNow,
+                ExpiryDate = DateTime.UtcNow.Add(jwtSettings.RefreshTokenLifetime),
+                User = user
+            };
+
+            var refreshTokenResponse = mapper.Map<GetRefreshToken>(refreshToken);
+            refreshTokenResponse.User.Role = claims["role"].ToString() ?? AppRoles.User;
+
+            await repository.UserRepository.AddRefreshTokenAsync(refreshToken);
+
+            await repository.SaveAsync();
+
+            return refreshTokenResponse;
+        }
+
         string GenerateRefreshToken()
         {
             var randomNumber = new byte[32];
@@ -301,6 +297,5 @@ namespace LearnProject.BLL.Services.Services
                 return Convert.ToBase64String(randomNumber);
             }
         }
-
     }
 }

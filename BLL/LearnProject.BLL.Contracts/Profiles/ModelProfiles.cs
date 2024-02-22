@@ -69,7 +69,7 @@ namespace LearnProject.BLL.Contracts.Models
     {
         public GetUserModelProfile()
         {
-            CreateMap<User, GetUserModel>();
+            CreateMap<User, GetUserModel>().ForMember(dest => dest.Role, opt => opt.Ignore());
 
             CreateMap<UserWithRoleModel, GetUserModel>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.User.Id))

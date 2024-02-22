@@ -37,8 +37,7 @@ namespace Cars.Api.Controllers.Users
         /// <summary>
         /// получение пользователей
         /// </summary>
-        /// <param name="offset">смещение</param>
-        /// <param name="limit">макс. значение</param>
+        /// <param name="parameters">параметры запроса</param>
         [HttpGet("")]
         [ProducesResponseType(typeof(IEnumerable<UserResponse>), 200)]
         public IEnumerable<UserResponse> GetUsers([FromQuery] UserQueryParameters parameters)

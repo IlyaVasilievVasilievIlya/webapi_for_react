@@ -8,8 +8,8 @@ using LearnProject.Domain.Models;
 using Minio;
 using Minio.DataModel.Args;
 using Microsoft.AspNetCore.WebUtilities;
-using Cars.Api.Settings;
 using System.Runtime.InteropServices;
+using LearnProject.Shared.Common.Settings;
 
 namespace LearnProject.BLL.Services
 {
@@ -79,9 +79,9 @@ namespace LearnProject.BLL.Services
 
             var serviceResponse = await imageService.GetImageAsync($"car_{car.CarId}");
 
-            if (serviceResponse.IsSuccessful)
+            if (serviceResponse.IsSuccessful && serviceResponse.Value != null)
             {
-                value.Image = serviceResponse.Value!.ToArray();
+                value.Image = serviceResponse.Value.ToArray();
             }
 
             return ServiceResponse<GetCarModel>.CreateSuccessfulResponse(value);

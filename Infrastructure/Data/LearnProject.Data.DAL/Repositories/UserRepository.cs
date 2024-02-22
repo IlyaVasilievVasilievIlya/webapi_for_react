@@ -94,6 +94,13 @@ namespace LearnProject.Data.DAL.Repositories
             return new UserWithRoleModel() { User = user, Role = role};
         }
 
+        public string GetUserRole(string id)
+        {
+            var role = context.UserRoles.AsQueryable().Where(userRole => userRole.UserId == id)
+                .Join(context.Roles.AsQueryable(), user => user.RoleId, role => role.Id, (user, role) => role.Name ?? "").First();
+            return role;
+        }
+
         public Task<RefreshToken> ReadRefreshTokenAsync(string refreshToken)
         {
             var tokens = context.RefreshTokens.Include(e => e.User);

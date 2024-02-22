@@ -21,12 +21,17 @@ namespace LearnProject.BLL.Contracts
         /// <returns>результат операции</returns>
         Task<AuthenticationResponse> LogInAsync(LoginUserModel model);
 
-        Task<AuthenticationResponse> LogOut(string token); 
-
         /// <summary>
         /// вход через Google
         /// </summary>
         Task<AuthenticationResponse> LogInWithGoogleAsync(string token);
+
+
+        /// <summary>
+        /// разлогин (удаление refresh token)
+        /// </summary>
+        /// <param name="token"></param>
+        Task<AuthenticationResponse> LogOut(string token); 
 
         /// <summary>
         /// обновление refresh токена пользователя
@@ -35,6 +40,10 @@ namespace LearnProject.BLL.Contracts
         /// <returns>результат операции</returns>
         Task<AuthenticationResponse> RefreshTokenAsync(string token);
 
+        /// <summary>
+        /// проверить существование refresh token
+        /// </summary>
+        /// <param name="refreshToken"></param>
         Task<AuthenticationResponse> CheckRefreshTokenExists(string refreshToken);
     }
 }

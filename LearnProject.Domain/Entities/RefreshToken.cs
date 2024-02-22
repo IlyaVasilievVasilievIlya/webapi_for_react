@@ -29,6 +29,6 @@
         /// <summary>
         /// навигационное свойство
         /// </summary>
-        public User User { get; set; }
+        public User User { get; set; } = null!;
     }
 }

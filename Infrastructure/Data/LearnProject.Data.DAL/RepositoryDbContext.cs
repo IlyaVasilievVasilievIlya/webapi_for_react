@@ -44,7 +44,7 @@ namespace LearnProject.Data.DAL
                 foreach (var property in entity.GetProperties())
                 {
                     var columnName = property.GetColumnName(StoreObjectIdentifier
-                        .Table(property.DeclaringEntityType.GetTableName(), null));
+                        .Table(property.DeclaringType.GetTableName(), null));
                     property.SetColumnName(columnName?.ToSnakeCase());
                 }
 
@@ -115,7 +115,7 @@ namespace LearnProject.Data.DAL
                     NormalizedUserName = "ilyavasilev56@gmail.com".ToUpper(),
                     Email = "ilyavasilev56@gmail.com",
                     NormalizedEmail = "ilyavasilev56@gmail.com".ToUpper(),
-                    PasswordHash = hasher.HashPassword(null, "1234!faS")
+                    PasswordHash = hasher.HashPassword(null!, "1234!faS")
                 }
             );
 

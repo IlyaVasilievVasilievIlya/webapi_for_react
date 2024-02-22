@@ -1,5 +1,4 @@
-﻿using Cars.Api.Settings;
-using LearnProject.BLL.Contracts;
+﻿using LearnProject.BLL.Contracts;
 using LearnProject.BLL.Contracts.Models;
 using LearnProject.Domain.Entities;
 using Minio.DataModel.Args;
@@ -12,6 +11,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
+using LearnProject.Shared.Common.Settings;
 
 namespace LearnProject.BLL.Services.Services
 {
@@ -24,21 +24,6 @@ namespace LearnProject.BLL.Services.Services
         {
             this.minioClient = minioClient;
             this.settings = settings;
-        }
-
-        public async Task<ServiceResponse<int>> DeleteImageAsync(string id)
-        {
-            try
-            {
-                await CheckObjectExists(id);
-
-                await minioClient.RemoveObjectAsync(new RemoveObjectArgs().WithBucket(settings.Bucket).WithObject(id));
-                return ServiceResponse<int>.CreateSuccessfulResponse();
-            }
-            catch (Exception ex)
-            {
-                return ServiceResponse<int>.CreateFailedResponse(ex.Message);
-            }
         }
 
         public async Task<ServiceResponse<MemoryStream>> GetImageAsync(string id)
@@ -63,12 +48,25 @@ namespace LearnProject.BLL.Services.Services
             try
             {
                 await minioClient.PutObjectAsync(new PutObjectArgs()
-                .WithStreamData(stream)
-                .WithBucket(settings.Bucket)
-                .WithObject(id).WithObjectSize(stream.Length));
+                    .WithStreamData(stream)
+                    .WithBucket(settings.Bucket)
+                    .WithObject(id).WithObjectSize(stream.Length));
 
                 await CheckObjectExists(id);
 
+                return ServiceResponse<int>.CreateSuccessfulResponse();
+            }
+            catch (Exception ex)
+            {
+                return ServiceResponse<int>.CreateFailedResponse(ex.Message);
+            }
+        }
+
+        public async Task<ServiceResponse<int>> DeleteImageAsync(string id)
+        {
+            try
+            {
+                await minioClient.RemoveObjectAsync(new RemoveObjectArgs().WithBucket(settings.Bucket).WithObject(id));
                 return ServiceResponse<int>.CreateSuccessfulResponse();
             }
             catch (Exception ex)

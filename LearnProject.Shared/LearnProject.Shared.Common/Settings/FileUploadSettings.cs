@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LearnProject.Shared.Common
+namespace LearnProject.Shared.Common.Settings
 {
     public class FileUploadSettings
     {

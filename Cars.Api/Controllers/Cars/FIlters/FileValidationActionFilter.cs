@@ -1,11 +1,14 @@
 ﻿using Cars.Api.Controllers.Cars.Models;
 using Cars.Api.Exceptions;
-using LearnProject.Shared.Common;
+using LearnProject.Shared.Common.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Cars.Api.Controllers.Cars.FIlters
 {
+    /// <summary>
+    /// фильтр проверки полученного файла
+    /// </summary>
     public class FileValidationActionFilter : Attribute, IAsyncActionFilter
     {
         readonly FileUploadSettings settings;
