@@ -31,12 +31,14 @@ services.AddAppMinio(builder.Configuration);
 
 services.AddAppSettings<FileUploadSettings>(builder.Configuration);
 services.AddAppSettings<ExternalProviders>(builder.Configuration);
+services.AddAppSettings<EmailSettings>(builder.Configuration);
 
 services.AddScoped<FileValidationActionFilter>();
 
 services.AddIdentityCore<User>()
     .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<RepositoryAppDbContext>();
+    .AddEntityFrameworkStores<RepositoryAppDbContext>()
+    .AddDefaultTokenProviders();
 
 builder.Services.Configure<IdentityOptions>(options =>
 {

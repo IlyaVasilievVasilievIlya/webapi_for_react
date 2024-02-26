@@ -23,6 +23,7 @@ namespace Cars.Api.Configuration
             services.AddScoped<IMigrationService, MigrationService>();
             services.AddScoped<IIdentityService, IdentityService>();
             services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
+            services.AddScoped<IEmailSenderService, EmailSenderService>();
 
             services.AddScoped<ICarService, CarService>();
             services.AddScoped<IUserService, UserService>();

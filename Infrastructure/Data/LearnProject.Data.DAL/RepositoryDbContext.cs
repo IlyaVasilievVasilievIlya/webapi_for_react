@@ -114,6 +114,7 @@ namespace LearnProject.Data.DAL
                     BirthDate = new DateOnly(1999, 2, 2),
                     NormalizedUserName = "ilyavasilev56@gmail.com".ToUpper(),
                     Email = "ilyavasilev56@gmail.com",
+                    EmailConfirmed = true,
                     NormalizedEmail = "ilyavasilev56@gmail.com".ToUpper(),
                     PasswordHash = hasher.HashPassword(null!, "1234!faS")
                 }

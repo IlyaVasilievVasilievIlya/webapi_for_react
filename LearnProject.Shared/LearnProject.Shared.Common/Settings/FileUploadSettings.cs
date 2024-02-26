@@ -8,7 +8,7 @@ namespace LearnProject.Shared.Common.Settings
 {
     public class FileUploadSettings
     {
-        public string MAX_SIZE { get; set; } = string.Empty;
+        public int MAX_SIZE { get; set; }
         public string AllowedExtensions { get; set; } = string.Empty;
     }
 }

@@ -27,7 +27,7 @@ namespace Cars.Api.Middleware
             ProcessProblemDetails? response = null;
             try
             {
-                await next.Invoke(context);
+                await next(context);
             }
             catch (Exception pe)
             {

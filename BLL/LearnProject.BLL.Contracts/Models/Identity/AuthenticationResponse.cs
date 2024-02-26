@@ -11,7 +11,8 @@ namespace LearnProject.BLL.Contracts.Models
         InvalidPasswordWhileLogin,
         RefreshingTokenFailed,
         TokenValidationFailed,
-        RefreshTokenNotFound
+        RefreshTokenNotFound,
+        ConfirmationFailed
     }
 
     /// <summary>

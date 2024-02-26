@@ -3,6 +3,8 @@ using Cars.Api.Controllers.Identity.Models;
 using Google.Apis.Auth;
 using LearnProject.BLL.Contracts;
 using LearnProject.BLL.Contracts.Models;
+using LearnProject.BLL.Contracts.Models.Identity;
+using LearnProject.Data.DAL.Repositories;
 using LearnProject.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +30,7 @@ namespace Cars.Api.Controllers.Identity
         public IdentityController(IIdentityService identityService, IMapper mapper)
         {
             this.identityService = identityService;
-            this.mapper=mapper; 
+            this.mapper = mapper;
         }
 
         /// <summary>
@@ -94,7 +96,42 @@ namespace Cars.Api.Controllers.Identity
             });
         }
 
+        [HttpPost("confirmation")]
+        public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailRequest request)
+        {
+            var response = await identityService.ConfirmEmailAsync(request.Token, request.Email);
+            if (response.IsSuccessful)
+            {
+                return Ok();
+            }
+            return Ok(response.Error);
+        }
 
+        [HttpPost("forgotPasswordCodeSending")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+        {
+            var response = await identityService.ForgotPassword(request.Email);
+
+            if (response.IsSuccessful)
+            {
+                return Ok();
+            }
+            return Ok(response.Error);
+        }
+
+        [HttpPost("passwordResetting")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+        {
+            var model = mapper.Map<ResetPasswordModel>(request);
+
+            var response = await identityService.ResetPassword(model);
+
+            if (response.IsSuccessful)
+            {
+                return Ok();
+            }
+            return Ok(response.Error);
+        }
 
         /// <summary>
         /// вход через Google

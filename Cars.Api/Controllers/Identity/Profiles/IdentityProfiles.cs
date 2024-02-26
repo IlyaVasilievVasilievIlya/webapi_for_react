@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Cars.Api.Controllers.Identity.Models;
 using LearnProject.BLL.Contracts.Models;
+using LearnProject.BLL.Contracts.Models.Identity;
 
 namespace Cars.Api.Controllers.Identity.Profiles
 {
@@ -28,6 +29,14 @@ namespace Cars.Api.Controllers.Identity.Profiles
             public RegisterRequestProfile()
             {
                 CreateMap<RegisterRequest, RegisterUserModel>();
+            }
+        }
+
+        public class ResetPasswordRequestProfile : Profile
+        {
+            public ResetPasswordRequestProfile()
+            {
+                CreateMap<ResetPasswordRequest, ResetPasswordModel>();
             }
         }
     }

@@ -2,11 +2,14 @@
 using Google.Apis.Auth;
 using LearnProject.BLL.Contracts;
 using LearnProject.BLL.Contracts.Models;
+using LearnProject.BLL.Contracts.Models.EmailMessage;
+using LearnProject.BLL.Contracts.Models.Identity;
 using LearnProject.Domain.Entities;
 using LearnProject.Domain.Repositories;
 using LearnProject.Shared.Common;
 using LearnProject.Shared.Common.Settings;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -31,9 +34,10 @@ namespace LearnProject.BLL.Services.Services
         readonly JwtSettings jwtSettings;
         readonly ExternalProviders providers;
         readonly UserManager<User> userManager;
+        readonly IEmailSenderService emailSender;
 
         public IdentityService(IRepositoryWrapper repository, IMapper mapper, ILogger<IdentityService> logger,
-            JwtSettings jwtSettings, ExternalProviders providers, UserManager<User> userManager)
+            JwtSettings jwtSettings, ExternalProviders providers, UserManager<User> userManager, IEmailSenderService emailSender)
         {
             this.repository = repository;
             this.mapper = mapper;
@@ -41,6 +45,7 @@ namespace LearnProject.BLL.Services.Services
             this.jwtSettings = jwtSettings;
             this.providers = providers;
             this.userManager = userManager;
+            this.emailSender = emailSender;
         }
 
         /// <summary>
@@ -60,7 +65,9 @@ namespace LearnProject.BLL.Services.Services
 
             var checkPassword = await userManager.CheckPasswordAsync(existingUser, model.Password);
 
-            if (!checkPassword)
+            var checkConfirmation = await userManager.IsEmailConfirmedAsync(existingUser);
+
+            if (!checkPassword || !checkConfirmation)
             {
                 logger.LogInformation("Cannot login user {Email}.", model.Email);
                 return AuthenticationResponse.CreateFailedResponse(AuthenticationResult.InvalidPasswordWhileLogin, new List<string> { "invalid login or password" });
@@ -125,6 +132,65 @@ namespace LearnProject.BLL.Services.Services
             return await CreateAuthenticationResultForNewUser(user, model.Password);
         }
 
+        public async Task<ServiceResponse<int>> ConfirmEmailAsync(string token, string email)
+        {
+            var existingUser = await userManager.FindByEmailAsync(email);
+
+            if (existingUser == null)
+            {
+                logger.LogInformation("Cannot confirm user {Email}.", email);
+                return ServiceResponse<int>.CreateFailedResponse("confirmation failed. Invalid token or email");
+            }
+
+            var result = await userManager.ConfirmEmailAsync(existingUser, token);
+            if (result.Succeeded)
+            {
+                return ServiceResponse<int>.CreateSuccessfulResponse();
+            }
+
+            return ServiceResponse<int>.CreateFailedResponse("confirmation failed. Invalid token or email");
+        }
+
+        public async Task<ServiceResponse<int>> ForgotPassword(string email)
+        {
+            var user = await userManager.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+                return ServiceResponse<int>.CreateFailedResponse("password resetting failed");
+            }
+
+            var token = await userManager.GeneratePasswordResetTokenAsync(user);
+
+            var sendPasswordRecovery = await emailSender.SendEmailAsync($"Your token for password recovering - {token}", "Cars app password recovering", user.Email!);
+
+            if (!sendPasswordRecovery.IsSuccessful)
+            {
+                throw new Exception(sendPasswordRecovery.Error);
+            }
+
+            return ServiceResponse<int>.CreateSuccessfulResponse();
+        }
+
+        public async Task<ServiceResponse<int>> ResetPassword(ResetPasswordModel model)
+        {
+            var user = await userManager.FindByEmailAsync(model.Email);
+
+            if (user == null)
+            {
+                return ServiceResponse<int>.CreateFailedResponse("password resetting failed");
+            }
+
+            var resetPassResult = await userManager.ResetPasswordAsync(user, model.Token, model.Password);
+
+            if (!resetPassResult.Succeeded) 
+            {
+                return ServiceResponse<int>.CreateFailedResponse("cannot reset password" + string.Join('.', resetPassResult.Errors.Select(e => e.Description)));
+            }
+
+            return ServiceResponse<int>.CreateSuccessfulResponse();
+        }
+
         public async Task<AuthenticationResponse> LogOut(string token)
         {
             var storedRefreshToken = await repository.UserRepository.ReadRefreshTokenAsync(token);
@@ -142,6 +208,7 @@ namespace LearnProject.BLL.Services.Services
 
             return AuthenticationResponse.CreateSuccessfulResponse();
         }
+
 
         /// <summary>
         /// обновление токена
@@ -205,6 +272,15 @@ namespace LearnProject.BLL.Services.Services
             {
                 logger.LogInformation("Cannot register user {Email}.", newUser.Email);
                 return AuthenticationResponse.CreateFailedResponse(AuthenticationResult.RegistrationFailed, result.Errors.Select(error => error.Description).ToList());
+            }
+
+            var token = await userManager.GenerateEmailConfirmationTokenAsync(newUser);
+            var sendConfirmation = await emailSender.SendEmailAsync(newUser.Email!, "Cars app confirmation", $"Your token - {token}");
+
+            if (!sendConfirmation.IsSuccessful)
+            {
+                await userManager.DeleteAsync(newUser);
+                throw new Exception(sendConfirmation.Error);
             }
 
             await userManager.AddToRoleAsync(newUser, AppRoles.User);

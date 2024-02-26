@@ -53,7 +53,7 @@ namespace Cars.Api.Controllers.Cars.FIlters
 
         bool checkFileSize(IFormFile file)
         {
-            return file.Length > 0 && file.Length <= int.Parse(settings.MAX_SIZE);
+            return file.Length > 0 && file.Length <= settings.MAX_SIZE;
         }
     }
 }

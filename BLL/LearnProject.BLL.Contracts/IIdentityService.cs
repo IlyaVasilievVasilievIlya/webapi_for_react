@@ -1,4 +1,5 @@
 ﻿using LearnProject.BLL.Contracts.Models;
+using LearnProject.BLL.Contracts.Models.Identity;
 
 namespace LearnProject.BLL.Contracts
 {
@@ -26,6 +27,12 @@ namespace LearnProject.BLL.Contracts
         /// </summary>
         Task<AuthenticationResponse> LogInWithGoogleAsync(string token);
 
+
+        Task<ServiceResponse<int>> ConfirmEmailAsync(string token, string email);
+
+        Task<ServiceResponse<int>> ForgotPassword(string email);
+
+        Task<ServiceResponse<int>> ResetPassword(ResetPasswordModel model);
 
         /// <summary>
         /// разлогин (удаление refresh token)
