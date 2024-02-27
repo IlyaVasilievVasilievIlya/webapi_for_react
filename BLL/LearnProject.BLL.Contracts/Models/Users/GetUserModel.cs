@@ -39,5 +39,7 @@
         /// роль
         /// </summary>
         public required string Role { get; set; }
+
+        public required bool EmailConfirmed { get; set; }
     }
 }

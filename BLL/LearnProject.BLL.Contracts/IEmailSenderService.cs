@@ -10,6 +10,8 @@ namespace LearnProject.BLL.Contracts
 {
     public interface IEmailSenderService
     {
-        Task<ServiceResponse<int>> SendEmailAsync(string to, string subject, string body);
+        Task<ServiceResponse<int>> SendConfirmationEmailAsync(string to, string subject, string body);
+
+        Task<ServiceResponse<int>> SendPasswordResetEmailAsync(string to, string subject, string body);
     }
 }

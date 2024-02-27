@@ -21,10 +21,20 @@ namespace LearnProject.BLL.Services.Services
             this.settings = settings;
         }
 
-        public async Task<ServiceResponse<int>> SendEmailAsync(string to, string subject, string body)
+        public Task<ServiceResponse<int>> SendConfirmationEmailAsync(string to, string subject, string body)
         {
-            var emailMessage = CreateEmailMessage(new EmailMessage() { To = to, Subject = subject, Body = body});
+            var emailMessage = CreateConfirmationEmailMessage(new EmailMessage() { To = to, Subject = subject, Body = body});
+            return TrySend(emailMessage);
+        }
 
+        public Task<ServiceResponse<int>> SendPasswordResetEmailAsync(string to, string subject, string body)
+        {
+            var emailMessage = CreateResetEmailMessage(new EmailMessage() { To = to, Subject = subject, Body = body });
+            return TrySend(emailMessage);
+        }
+
+        async Task<ServiceResponse<int>> TrySend(MimeMessage emailMessage)
+        {
             try
             {
                 await SendAsync(emailMessage);
@@ -36,13 +46,36 @@ namespace LearnProject.BLL.Services.Services
             }
         }
 
-        MimeMessage CreateEmailMessage(EmailMessage message)
+        MimeMessage CreateConfirmationEmailMessage(EmailMessage message)
         {
             var emailMessage = new MimeMessage();
             emailMessage.From.Add(new MailboxAddress("email", settings.Username));
             emailMessage.To.Add(new MailboxAddress("email", message.To));
             emailMessage.Subject = message.Subject;
-            emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Text) { Text = message.Body };
+
+            var bodyBuilder = new BodyBuilder();
+
+            bodyBuilder.HtmlBody = $"<a>{message.Body}</a>";
+            bodyBuilder.TextBody = "Confirm your email via link";
+
+            emailMessage.Body = new BodyBuilder().ToMessageBody();
+
+            return emailMessage;
+        }
+
+        MimeMessage CreateResetEmailMessage(EmailMessage message)
+        {
+            var emailMessage = new MimeMessage();
+            emailMessage.From.Add(new MailboxAddress("email", settings.Username));
+            emailMessage.To.Add(new MailboxAddress("email", message.To));
+            emailMessage.Subject = message.Subject;
+
+            var bodyBuilder = new BodyBuilder();
+
+            bodyBuilder.HtmlBody = $"<a>{message.Body}</a>";
+            bodyBuilder.TextBody = "Confirm your email via link";
+
+            emailMessage.Body = new BodyBuilder().ToMessageBody();
 
             return emailMessage;
         }

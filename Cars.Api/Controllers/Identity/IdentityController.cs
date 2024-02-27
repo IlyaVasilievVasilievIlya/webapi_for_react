@@ -44,9 +44,15 @@ namespace Cars.Api.Controllers.Identity
         public async Task<IActionResult> Register(RegisterRequest request)
         {
             var model = mapper.Map<RegisterUserModel>(request);
-            var authResponse = await identityService.RegisterAsync(model);
+            var activationLink = string.Join("/", new[]
+            {
+                $"{Request.Scheme}://{Request.Host.Value}/api",
+                RouteData.Values["controller"],
+                "confirmation"
+            });
+            var authResponse = await identityService.RegisterAsync(model, activationLink + "?email={0}&token={1}");
 
-            if(authResponse.Result == AuthenticationResult.RegistrationFailed)
+            if (authResponse.Result == AuthenticationResult.RegistrationFailed)
             {
                 return Unauthorized(authResponse.Errors);
             }
@@ -97,7 +103,7 @@ namespace Cars.Api.Controllers.Identity
         }
 
         [HttpPost("confirmation")]
-        public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailRequest request)
+        public async Task<IActionResult> ConfirmEmail(ConfirmEmailRequest request)
         {
             var response = await identityService.ConfirmEmailAsync(request.Token, request.Email);
             if (response.IsSuccessful)
@@ -108,7 +114,7 @@ namespace Cars.Api.Controllers.Identity
         }
 
         [HttpPost("forgotPasswordCodeSending")]
-        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest request)
         {
             var response = await identityService.ForgotPassword(request.Email);
 
@@ -142,7 +148,8 @@ namespace Cars.Api.Controllers.Identity
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> LoginWithGoogle([FromBody] string token)
         {
-            var authResponse = await identityService.LogInWithGoogleAsync(token);
+            var activationLink = Url.Link("Identity/token/refreshing", null);
+            var authResponse = await identityService.LogInWithGoogleAsync(token, activationLink + "?email={0}&token={1}");
 
             if (authResponse.Result == AuthenticationResult.TokenValidationFailed)
             {

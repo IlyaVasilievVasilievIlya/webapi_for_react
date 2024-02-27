@@ -35,10 +35,7 @@ services.AddAppSettings<EmailSettings>(builder.Configuration);
 
 services.AddScoped<FileValidationActionFilter>();
 
-services.AddIdentityCore<User>()
-    .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<RepositoryAppDbContext>()
-    .AddDefaultTokenProviders();
+services.AddAppIdentity();
 
 builder.Services.Configure<IdentityOptions>(options =>
 {

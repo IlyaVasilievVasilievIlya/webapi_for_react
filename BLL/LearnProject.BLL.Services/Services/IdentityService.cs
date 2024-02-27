@@ -65,9 +65,7 @@ namespace LearnProject.BLL.Services.Services
 
             var checkPassword = await userManager.CheckPasswordAsync(existingUser, model.Password);
 
-            var checkConfirmation = await userManager.IsEmailConfirmedAsync(existingUser);
-
-            if (!checkPassword || !checkConfirmation)
+            if (!checkPassword)
             {
                 logger.LogInformation("Cannot login user {Email}.", model.Email);
                 return AuthenticationResponse.CreateFailedResponse(AuthenticationResult.InvalidPasswordWhileLogin, new List<string> { "invalid login or password" });
@@ -76,7 +74,7 @@ namespace LearnProject.BLL.Services.Services
             return await CreateAuthenticationResultForExistingUser(existingUser);
         }
 
-        public async Task<AuthenticationResponse> LogInWithGoogleAsync(string token)
+        public async Task<AuthenticationResponse> LogInWithGoogleAsync(string token, string activationLink)
         {
             var settings = new GoogleJsonWebSignature.ValidationSettings()
             {
@@ -109,7 +107,7 @@ namespace LearnProject.BLL.Services.Services
                 Email = payload.Email
             };
 
-            return await CreateAuthenticationResultForNewUser(newUser);
+            return await CreateAuthenticationResultForNewUser(newUser, activationLink);
         }
 
         /// <summary>
@@ -117,7 +115,7 @@ namespace LearnProject.BLL.Services.Services
         /// </summary>
         /// <param name="model">модель добавления пользователя</param>
         /// <returns>ответ с моделью AuthenticationResult</returns>
-        public async Task<AuthenticationResponse> RegisterAsync(RegisterUserModel model)
+        public async Task<AuthenticationResponse> RegisterAsync(RegisterUserModel model, string activationLink)
         {
             var existingUser = await userManager.FindByEmailAsync(model.Email);
 
@@ -129,7 +127,7 @@ namespace LearnProject.BLL.Services.Services
 
             User user = mapper.Map<User>(model);
 
-            return await CreateAuthenticationResultForNewUser(user, model.Password);
+            return await CreateAuthenticationResultForNewUser(user, activationLink, model.Password);
         }
 
         public async Task<ServiceResponse<int>> ConfirmEmailAsync(string token, string email)
@@ -162,7 +160,7 @@ namespace LearnProject.BLL.Services.Services
 
             var token = await userManager.GeneratePasswordResetTokenAsync(user);
 
-            var sendPasswordRecovery = await emailSender.SendEmailAsync($"Your token for password recovering - {token}", "Cars app password recovering", user.Email!);
+            var sendPasswordRecovery = await emailSender.SendPasswordResetEmailAsync(user.Email!, "Cars app password recovering", $"Your token for password recovering - {token}");
 
             if (!sendPasswordRecovery.IsSuccessful)
             {
@@ -264,7 +262,7 @@ namespace LearnProject.BLL.Services.Services
             return AuthenticationResponse.CreateSuccessfulResponse(string.Empty, refreshTokenResponse);
         }
 
-        private async Task<AuthenticationResponse> CreateAuthenticationResultForNewUser(User newUser, string? password = null)
+        private async Task<AuthenticationResponse> CreateAuthenticationResultForNewUser(User newUser, string activationLink, string? password = null)
         {
             var result = password == null ? await userManager.CreateAsync(newUser) : await userManager.CreateAsync(newUser, password);
 
@@ -275,7 +273,7 @@ namespace LearnProject.BLL.Services.Services
             }
 
             var token = await userManager.GenerateEmailConfirmationTokenAsync(newUser);
-            var sendConfirmation = await emailSender.SendEmailAsync(newUser.Email!, "Cars app confirmation", $"Your token - {token}");
+            var sendConfirmation = await emailSender.SendConfirmationEmailAsync(newUser.Email!, "Cars app confirmation", string.Format(activationLink, newUser.Email, token));
 
             if (!sendConfirmation.IsSuccessful)
             {
@@ -335,7 +333,7 @@ namespace LearnProject.BLL.Services.Services
                 Issuer = jwtSettings.Issuer,
                 Claims = claims,
                 Audience = jwtSettings.Audience,
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256),
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);

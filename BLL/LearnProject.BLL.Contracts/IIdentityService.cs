@@ -13,7 +13,7 @@ namespace LearnProject.BLL.Contracts
         /// </summary>
         /// <param name="model">модель регистрации</param>
         /// <returns>результат операции</returns>
-        Task<AuthenticationResponse> RegisterAsync(RegisterUserModel model);
+        Task<AuthenticationResponse> RegisterAsync(RegisterUserModel model, string activationLink);
 
         /// <summary>
         /// вход пользователя
@@ -25,7 +25,7 @@ namespace LearnProject.BLL.Contracts
         /// <summary>
         /// вход через Google
         /// </summary>
-        Task<AuthenticationResponse> LogInWithGoogleAsync(string token);
+        Task<AuthenticationResponse> LogInWithGoogleAsync(string token, string activationLink);
 
 
         Task<ServiceResponse<int>> ConfirmEmailAsync(string token, string email);
