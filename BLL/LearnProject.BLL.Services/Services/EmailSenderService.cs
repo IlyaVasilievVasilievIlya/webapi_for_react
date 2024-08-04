@@ -53,12 +53,7 @@ namespace LearnProject.BLL.Services.Services
             emailMessage.To.Add(new MailboxAddress("email", message.To));
             emailMessage.Subject = message.Subject;
 
-            var bodyBuilder = new BodyBuilder();
-
-            bodyBuilder.HtmlBody = $"<a>{message.Body}</a>";
-            bodyBuilder.TextBody = "Confirm your email via link";
-
-            emailMessage.Body = new BodyBuilder().ToMessageBody();
+            emailMessage.Body = new TextPart ("html") { Text = $"<p>Confirm your email via <a href=\"{message.Body}\">link</a></p>" };
 
             return emailMessage;
         }

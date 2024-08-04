@@ -20,6 +20,7 @@ using System.Net;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Web;
 
 namespace LearnProject.BLL.Services.Services
 {
@@ -74,7 +75,7 @@ namespace LearnProject.BLL.Services.Services
             return await CreateAuthenticationResultForExistingUser(existingUser);
         }
 
-        public async Task<AuthenticationResponse> LogInWithGoogleAsync(string token, string activationLink)
+        public async Task<AuthenticationResponse> LogInWithGoogleAsync(string token)
         {
             var settings = new GoogleJsonWebSignature.ValidationSettings()
             {
@@ -107,7 +108,7 @@ namespace LearnProject.BLL.Services.Services
                 Email = payload.Email
             };
 
-            return await CreateAuthenticationResultForNewUser(newUser, activationLink);
+            return await CreateAuthenticationResultForNewUser(newUser);
         }
 
         /// <summary>
@@ -189,6 +190,24 @@ namespace LearnProject.BLL.Services.Services
             return ServiceResponse<int>.CreateSuccessfulResponse();
         }
 
+        public async Task<ServiceResponse<int>> CheckResetPasswordCode(string code, string userId)
+        {
+            var user = await userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                return ServiceResponse<int>.CreateFailedResponse("password resetting failed");
+            }
+            var purpose = UserManager<User>.ResetPasswordTokenPurpose;
+            if (!await userManager.VerifyUserTokenAsync(user, "ResetPassword", purpose, code))
+            {
+                return ServiceResponse<int>.CreateFailedResponse("password resetting failed");
+            }
+
+            return ServiceResponse<int>.CreateSuccessfulResponse();
+        }
+
+
         public async Task<AuthenticationResponse> LogOut(string token)
         {
             var storedRefreshToken = await repository.UserRepository.ReadRefreshTokenAsync(token);
@@ -262,7 +281,7 @@ namespace LearnProject.BLL.Services.Services
             return AuthenticationResponse.CreateSuccessfulResponse(string.Empty, refreshTokenResponse);
         }
 
-        private async Task<AuthenticationResponse> CreateAuthenticationResultForNewUser(User newUser, string activationLink, string? password = null)
+        private async Task<AuthenticationResponse> CreateAuthenticationResultForNewUser(User newUser, string? activationLink = null, string? password = null)
         {
             var result = password == null ? await userManager.CreateAsync(newUser) : await userManager.CreateAsync(newUser, password);
 
@@ -273,12 +292,16 @@ namespace LearnProject.BLL.Services.Services
             }
 
             var token = await userManager.GenerateEmailConfirmationTokenAsync(newUser);
-            var sendConfirmation = await emailSender.SendConfirmationEmailAsync(newUser.Email!, "Cars app confirmation", string.Format(activationLink, newUser.Email, token));
 
-            if (!sendConfirmation.IsSuccessful)
+            if (activationLink  != null)
             {
-                await userManager.DeleteAsync(newUser);
-                throw new Exception(sendConfirmation.Error);
+                var sendConfirmation = await emailSender.SendConfirmationEmailAsync(newUser.Email!, "Cars app confirmation", string.Format(activationLink, newUser.Email, HttpUtility.UrlEncode(token)));
+
+                if (!sendConfirmation.IsSuccessful)
+                {
+                    await userManager.DeleteAsync(newUser);
+                    throw new Exception(sendConfirmation.Error);
+                }
             }
 
             await userManager.AddToRoleAsync(newUser, AppRoles.User);

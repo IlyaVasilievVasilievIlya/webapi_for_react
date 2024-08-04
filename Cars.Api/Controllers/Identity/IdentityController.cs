@@ -6,7 +6,9 @@ using LearnProject.BLL.Contracts.Models;
 using LearnProject.BLL.Contracts.Models.Identity;
 using LearnProject.Data.DAL.Repositories;
 using LearnProject.Domain.Entities;
+using LearnProject.Shared.Common;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Cars.Api.Controllers.Identity
@@ -102,13 +104,14 @@ namespace Cars.Api.Controllers.Identity
             });
         }
 
-        [HttpPost("confirmation")]
-        public async Task<IActionResult> ConfirmEmail(ConfirmEmailRequest request)
+        [HttpGet("confirmation")]
+        [Consumes("text/html", new string[] {"application/json"})]
+        public async Task<IActionResult> ConfirmEmail([FromQuery] ConfirmEmailRequest request)
         {
             var response = await identityService.ConfirmEmailAsync(request.Token, request.Email);
             if (response.IsSuccessful)
             {
-                return Ok();
+                return Redirect(AllowedOrigins.ClientApp);
             }
             return Ok(response.Error);
         }
@@ -125,7 +128,19 @@ namespace Cars.Api.Controllers.Identity
             return Ok(response.Error);
         }
 
+        [HttpPost("resetPasswordCodeChecking")]
+        public async Task<IActionResult> CheckResetPasswordCode(string code, string userId)
+        {
+            var response = await identityService.CheckResetPasswordCode(code, userId);
+            if (response.IsSuccessful)
+            {
+                return Ok();
+            }
+            return Ok(response.Error);
+        }
+
         [HttpPost("passwordResetting")]
+        [Consumes("text/html", new string[] { "application/json" })]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
         {
             var model = mapper.Map<ResetPasswordModel>(request);
@@ -148,8 +163,7 @@ namespace Cars.Api.Controllers.Identity
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> LoginWithGoogle([FromBody] string token)
         {
-            var activationLink = Url.Link("Identity/token/refreshing", null);
-            var authResponse = await identityService.LogInWithGoogleAsync(token, activationLink + "?email={0}&token={1}");
+            var authResponse = await identityService.LogInWithGoogleAsync(token);
 
             if (authResponse.Result == AuthenticationResult.TokenValidationFailed)
             {

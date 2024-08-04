@@ -25,12 +25,14 @@ namespace LearnProject.BLL.Contracts
         /// <summary>
         /// вход через Google
         /// </summary>
-        Task<AuthenticationResponse> LogInWithGoogleAsync(string token, string activationLink);
+        Task<AuthenticationResponse> LogInWithGoogleAsync(string token);
 
 
         Task<ServiceResponse<int>> ConfirmEmailAsync(string token, string email);
 
         Task<ServiceResponse<int>> ForgotPassword(string email);
+
+        Task<ServiceResponse<int>> CheckResetPasswordCode(string code, string userId);
 
         Task<ServiceResponse<int>> ResetPassword(ResetPasswordModel model);
 

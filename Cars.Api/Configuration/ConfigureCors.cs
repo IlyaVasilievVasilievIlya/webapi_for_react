@@ -23,6 +23,11 @@ namespace Cars.Api.Configuration
                     .AllowCredentials()
                     .WithExposedHeaders("Pagination");
                 });
+                builder.AddPolicy("AllowAnyOrigin", policy =>
+                {
+                    policy.AllowAnyOrigin();
+                    policy.AllowAnyMethod();
+                });
             });
             return services;
         }
